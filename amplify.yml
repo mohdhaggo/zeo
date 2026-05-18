@@ -18,3 +18,17 @@ frontend:
     paths:
       - .npm/**/*
       - node_modules/**/*
+  
+  # IMPORTANT: Add these customHeaders for SPA routing
+  customHeaders:
+    - pattern: '**/*'
+      headers:
+        - key: 'Cache-Control'
+          value: 'max-age=0, no-cache, no-store, must-revalidate'
+  
+  # CRITICAL: Rewrites for React Router (SPA)
+  rewrites:
+    - source: '/**'
+      target: '/index.html'
+      condition: '200'
+      status: '200'
