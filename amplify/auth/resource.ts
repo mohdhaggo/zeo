@@ -13,10 +13,4 @@ export const auth = defineAuth({
     mode: 'OPTIONAL',
     email: true,
   },
-  senders: {
-    email: {
-      fromEmail: 'noreply@yourdomain.com', // Replace with your verified email
-      fromName: 'Zeo Shields',
-    },
-  },
 });
