@@ -7,7 +7,6 @@ export const AdminLoginPage: React.FC = () => {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const [codeDeliveryDetails, setCodeDeliveryDetails] = useState<{ destination?: string }>({});
 
   // Allowed admin emails
   const allowedAdmins = ['mohd.haggo@gmail.com', 'admin@zeoshields.com', 'zeoadmin@gmail.com'];
@@ -33,10 +32,9 @@ export const AdminLoginPage: React.FC = () => {
       });
       
       if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_EMAIL_CODE') {
-        setCodeDeliveryDetails(nextStep.codeDeliveryDetails || {});
         setMessage({ 
           type: 'success', 
-          text: `OTP sent to ${nextStep.codeDeliveryDetails?.destination || email}. Please check your inbox.` 
+          text: `OTP sent to ${email}. Please check your inbox.` 
         });
         setStep('otp');
       } else {
