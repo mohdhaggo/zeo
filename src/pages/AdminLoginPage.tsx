@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
+import { signIn, confirmSignIn } from 'aws-amplify/auth';
 
 export const AdminLoginPage: React.FC = () => {
   const [step, setStep] = useState<'email' | 'otp'>('email');
@@ -6,14 +7,10 @@ export const AdminLoginPage: React.FC = () => {
   const [otp, setOtp] = useState('');
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-  const generatedOtpRef = useRef<string>('');
+  const [codeDeliveryDetails, setCodeDeliveryDetails] = useState<{ destination?: string }>({});
 
   // Allowed admin emails
   const allowedAdmins = ['mohd.haggo@gmail.com', 'admin@zeoshields.com', 'zeoadmin@gmail.com'];
-
-  const generateOTP = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  };
 
   const handleSendOTP = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,34 +23,77 @@ export const AdminLoginPage: React.FC = () => {
     setLoading(true);
     setMessage(null);
 
-    const otpCode = generateOTP();
-    generatedOtpRef.current = otpCode;
-    
-    // Show OTP in console and alert for demo
-    console.log('=========================================');
-    console.log('YOUR OTP CODE:', otpCode);
-    console.log('=========================================');
-    
-    // Also show in alert for easier testing
-    alert(`Your OTP code is: ${otpCode}\n\n(Check console as well)`);
-    
-    setMessage({ type: 'success', text: `OTP sent to ${email}. Check console for code.` });
-    setStep('otp');
-    setLoading(false);
+    try {
+      // Send real OTP via AWS Cognito
+      const { nextStep } = await signIn({
+        username: email,
+        options: {
+          authFlowType: 'USER_AUTH',
+          preferredChallenge: 'EMAIL_OTP',
+        },
+      });
+      
+      if (nextStep.signInStep === 'CONFIRM_SIGN_IN_WITH_EMAIL_CODE') {
+        setCodeDeliveryDetails(nextStep.codeDeliveryDetails || {});
+        setMessage({ 
+          type: 'success', 
+          text: `OTP sent to ${email}. Please check your inbox.` 
+        });
+        setStep('otp');
+      } else {
+        setMessage({ 
+          type: 'error', 
+          text: 'Unexpected sign-in step. Please try again.' 
+        });
+      }
+    } catch (error: any) {
+      console.error('Sign-in error:', error);
+      
+      // Check if user needs to be created first
+      if (error.name === 'UserNotFoundException') {
+        setMessage({ 
+          type: 'error', 
+          text: 'Email not found. Please contact administrator.' 
+        });
+      } else {
+        setMessage({ 
+          type: 'error', 
+          text: error.message || 'Failed to send OTP. Please try again.' 
+        });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleVerifyOTP = (e: React.FormEvent) => {
+  const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    console.log('Entered OTP:', otp);
-    console.log('Generated OTP:', generatedOtpRef.current);
-    
-    if (otp === generatedOtpRef.current) {
-      localStorage.setItem('adminAuthenticated', 'true');
-      localStorage.setItem('adminEmail', email);
-      window.location.href = '/dashboard';
-    } else {
-      setMessage({ type: 'error', text: 'Invalid OTP. Please try again.' });
+    setLoading(true);
+    setMessage(null);
+
+    try {
+      // Verify OTP code
+      const { nextStep } = await confirmSignIn({
+        challengeResponse: otp,
+      });
+      
+      if (nextStep.signInStep === 'DONE') {
+        // Store auth info
+        localStorage.setItem('adminAuthenticated', 'true');
+        localStorage.setItem('adminEmail', email);
+        // Redirect to dashboard
+        window.location.href = '/dashboard';
+      } else {
+        setMessage({ type: 'error', text: 'Verification failed. Please try again.' });
+      }
+    } catch (error: any) {
+      console.error('OTP verification error:', error);
+      setMessage({ 
+        type: 'error', 
+        text: error.message || 'Invalid OTP code. Please try again.' 
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -121,7 +161,8 @@ export const AdminLoginPage: React.FC = () => {
                 borderRadius: '40px',
                 fontWeight: 'bold',
                 fontFamily: "'Orbitron', monospace",
-                cursor: loading ? 'not-allowed' : 'pointer'
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.7 : 1
               }}
             >
               {loading ? 'Sending...' : 'Send OTP'}
@@ -152,6 +193,7 @@ export const AdminLoginPage: React.FC = () => {
             />
             <button
               type="submit"
+              disabled={loading}
               style={{
                 width: '100%',
                 background: '#E50914',
@@ -161,11 +203,12 @@ export const AdminLoginPage: React.FC = () => {
                 borderRadius: '40px',
                 fontWeight: 'bold',
                 fontFamily: "'Orbitron', monospace",
-                cursor: 'pointer',
-                marginBottom: '12px'
+                cursor: loading ? 'not-allowed' : 'pointer',
+                marginBottom: '12px',
+                opacity: loading ? 0.7 : 1
               }}
             >
-              Verify & Login
+              {loading ? 'Verifying...' : 'Verify & Login'}
             </button>
             <button
               type="button"
@@ -205,7 +248,7 @@ export const AdminLoginPage: React.FC = () => {
         )}
         
         <div style={{ marginTop: '20px', fontSize: '0.75rem', color: '#555' }}>
-          <p>Demo: OTP will appear in alert box</p>
+          <p>OTP will be sent to your email address</p>
           <p>Allowed emails: mohd.haggo@gmail.com</p>
         </div>
       </div>
