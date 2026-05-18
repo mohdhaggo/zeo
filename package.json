@@ -13,7 +13,9 @@
     "@aws-amplify/ui-react": "~6.13.2",
     "aws-amplify": "~6.15.10",
     "react": "~18.3.1",
-    "react-dom": "~18.3.1"
+    "react-dom": "~18.3.1",
+    "react-google-recaptcha": "^3.1.0",
+    "react-router-dom": "^7.15.1"
   },
   "engines": {
     "node": ">= 20.20.0",
@@ -27,6 +29,7 @@
     "@eslint/js": "~9.39.2",
     "@types/react": "~18.3.27",
     "@types/react-dom": "~18.3.7",
+    "@types/react-google-recaptcha": "^2.1.9",
     "@typescript-eslint/eslint-plugin": "~8.53.0",
     "@typescript-eslint/parser": "~8.53.0",
     "@vitejs/plugin-react": "~5.1.2",
