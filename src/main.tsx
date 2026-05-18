@@ -1,21 +1,18 @@
-import type { Schema } from '../amplify/data/resource';
-import { useAuthenticator } from '@aws-amplify/ui-react';
-import { useEffect, useState } from 'react';
-import { generateClient } from 'aws-amplify/data';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { Authenticator } from '@aws-amplify/ui-react';
+import { Amplify } from 'aws-amplify';
+import App from './App.tsx';
+import outputs from '../amplify_outputs.json';
+import './index.css';
+import '@aws-amplify/ui-react/styles.css';
 
-const client = generateClient<Schema>();
+Amplify.configure(outputs);
 
-function App() {
-  const { signOut } = useAuthenticator();
-
-  // ...
-
-  return (
-    <main>
-      {/* ... */}
-      <button onClick={signOut}>Sign out</button>
-    </main>
-  );
-}
-
-export default App;
+ReactDOM.createRoot(document.getElementById('root')!).render(
+  <React.StrictMode>
+    <Authenticator>
+      <App />
+    </Authenticator>
+  </React.StrictMode>
+);
