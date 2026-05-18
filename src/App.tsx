@@ -1,3 +1,4 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { HomePage } from './pages/HomePage';
 import { AboutPage } from './pages/AboutPage';
 import { ProductsPage } from './pages/ProductsPage';
@@ -13,31 +14,79 @@ import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 
 function App() {
-  const path = window.location.pathname;
-  
-  // Admin routes (no navbar/footer)
-  if (path === '/admin-login') return <AdminLoginPage />;
-  if (path === '/dashboard') return <AdminDashboard />;
-  
-  // Public routes with navbar/footer
-  const getPublicPage = () => {
-    if (path === '/about') return <AboutPage />;
-    if (path === '/products') return <ProductsPage />;
-    if (path === '/ppf-cat') return <PPFPage />;
-    if (path === '/titan-ppf') return <TitanPPFPage />;
-    if (path === '/ultra-ppf') return <UltraPPFPage />;
-    if (path === '/titan-satin-ppf') return <TitanSatinPPFPage />;
-    if (path === '/warranty') return <WarrantyPage />;
-    if (path === '/contact') return <ContactPage />;
-    return <HomePage />;
-  };
-
   return (
-    <>
-      <Navbar />
-      {getPublicPage()}
-      <Footer />
-    </>
+    <BrowserRouter>
+      <Routes>
+        {/* Admin routes (no navbar/footer) */}
+        <Route path="/admin-login" element={<AdminLoginPage />} />
+        <Route path="/dashboard" element={<AdminDashboard />} />
+        
+        {/* Public routes with navbar/footer */}
+        <Route path="/" element={
+          <>
+            <Navbar />
+            <HomePage />
+            <Footer />
+          </>
+        } />
+        <Route path="/about" element={
+          <>
+            <Navbar />
+            <AboutPage />
+            <Footer />
+          </>
+        } />
+        <Route path="/products" element={
+          <>
+            <Navbar />
+            <ProductsPage />
+            <Footer />
+          </>
+        } />
+        <Route path="/ppf-cat" element={
+          <>
+            <Navbar />
+            <PPFPage />
+            <Footer />
+          </>
+        } />
+        <Route path="/titan-ppf" element={
+          <>
+            <Navbar />
+            <TitanPPFPage />
+            <Footer />
+          </>
+        } />
+        <Route path="/ultra-ppf" element={
+          <>
+            <Navbar />
+            <UltraPPFPage />
+            <Footer />
+          </>
+        } />
+        <Route path="/titan-satin-ppf" element={
+          <>
+            <Navbar />
+            <TitanSatinPPFPage />
+            <Footer />
+          </>
+        } />
+        <Route path="/warranty" element={
+          <>
+            <Navbar />
+            <WarrantyPage />
+            <Footer />
+          </>
+        } />
+        <Route path="/contact" element={
+          <>
+            <Navbar />
+            <ContactPage />
+            <Footer />
+          </>
+        } />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
