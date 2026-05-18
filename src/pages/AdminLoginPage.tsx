@@ -24,7 +24,6 @@ export const AdminLoginPage: React.FC = () => {
     setMessage(null);
 
     try {
-      // Send real OTP via AWS Cognito
       const { nextStep } = await signIn({
         username: email,
         options: {
@@ -37,7 +36,7 @@ export const AdminLoginPage: React.FC = () => {
         setCodeDeliveryDetails(nextStep.codeDeliveryDetails || {});
         setMessage({ 
           type: 'success', 
-          text: `OTP sent to ${email}. Please check your inbox.` 
+          text: `OTP sent to ${nextStep.codeDeliveryDetails?.destination || email}. Please check your inbox.` 
         });
         setStep('otp');
       } else {
@@ -48,19 +47,10 @@ export const AdminLoginPage: React.FC = () => {
       }
     } catch (error: any) {
       console.error('Sign-in error:', error);
-      
-      // Check if user needs to be created first
-      if (error.name === 'UserNotFoundException') {
-        setMessage({ 
-          type: 'error', 
-          text: 'Email not found. Please contact administrator.' 
-        });
-      } else {
-        setMessage({ 
-          type: 'error', 
-          text: error.message || 'Failed to send OTP. Please try again.' 
-        });
-      }
+      setMessage({ 
+        type: 'error', 
+        text: error.message || 'Failed to send OTP. Please try again.' 
+      });
     } finally {
       setLoading(false);
     }
@@ -72,16 +62,13 @@ export const AdminLoginPage: React.FC = () => {
     setMessage(null);
 
     try {
-      // Verify OTP code
       const { nextStep } = await confirmSignIn({
         challengeResponse: otp,
       });
       
       if (nextStep.signInStep === 'DONE') {
-        // Store auth info
         localStorage.setItem('adminAuthenticated', 'true');
         localStorage.setItem('adminEmail', email);
-        // Redirect to dashboard
         window.location.href = '/dashboard';
       } else {
         setMessage({ type: 'error', text: 'Verification failed. Please try again.' });
@@ -126,7 +113,7 @@ export const AdminLoginPage: React.FC = () => {
             color: 'transparent'
           }}>Admin Access</h1>
           <p style={{ color: '#aaa', marginTop: '10px' }}>
-            {step === 'email' ? 'Enter your admin email to receive OTP' : 'Enter the verification code sent to your email'}
+            {step === 'email' ? 'Enter your email to receive OTP' : 'Enter the verification code sent to your email'}
           </p>
         </div>
 
@@ -136,7 +123,7 @@ export const AdminLoginPage: React.FC = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="mohd.haggo@gmail.com"
+              placeholder="Enter your email"
               required
               style={{
                 width: '100%',
@@ -249,7 +236,6 @@ export const AdminLoginPage: React.FC = () => {
         
         <div style={{ marginTop: '20px', fontSize: '0.75rem', color: '#555' }}>
           <p>OTP will be sent to your email address</p>
-          <p>Allowed emails: mohd.haggo@gmail.com</p>
         </div>
       </div>
     </div>
