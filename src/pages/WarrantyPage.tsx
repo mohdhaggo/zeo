@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 
-// Configure client for public access
+// Create client with explicit apiKey auth mode for public access
 const client = generateClient<Schema>({
-  authMode: 'apiKey', // Use API key instead of user pool for public access
+  authMode: 'apiKey'
 });
 
 interface WarrantyData {
@@ -61,10 +61,8 @@ export const WarrantyPage: React.FC = () => {
     setWarrantyDetails(null);
 
     try {
-      // Use API key auth mode for public access
-      const { data, errors } = await client.models.Warranty.list({
-        authMode: 'apiKey'
-      });
+      // List all warranties with public API key access
+      const { data, errors } = await client.models.Warranty.list();
       
       if (errors) {
         throw new Error(errors[0].message);
@@ -109,7 +107,7 @@ export const WarrantyPage: React.FC = () => {
     }
   };
 
-  // Register warranty using AWS Amplify
+  // Register warranty using AWS Amplify with public access
   const registerWarranty = async () => {
     if (!warrantyDetails) {
       setMessage({ text: 'Please validate a warranty first.', type: 'error' });

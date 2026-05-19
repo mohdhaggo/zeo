@@ -1,7 +1,6 @@
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 
 const schema = a.schema({
-  // Warranty model
   Warranty: a.model({
     warrantyNumber: a.string().required(),
     productName: a.string().required(),
@@ -16,11 +15,9 @@ const schema = a.schema({
     createdAt: a.datetime(),
   })
   .authorization(allow => [
-    allow.guest(),
-    allow.authenticated(),
+    allow.publicApiKey(),  // ✅ Public access via API Key
   ]),
 
-  // Contact submission model
   ContactSubmission: a.model({
     name: a.string().required(),
     email: a.string().required(),
@@ -32,8 +29,7 @@ const schema = a.schema({
     createdAt: a.datetime(),
   })
   .authorization(allow => [
-    allow.guest().to(['create']),
-    allow.authenticated(),
+    allow.publicApiKey(),  // ✅ Public access via API Key
   ]),
 });
 
