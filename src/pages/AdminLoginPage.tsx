@@ -253,13 +253,6 @@ export const AdminLoginPage: React.FC = () => {
     }
   };
 
-  const handleRegChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    if (e.target.name === 'fullName') {
-      // This would be used if you have a registration form
-      console.log('Full name changed:', e.target.value);
-    }
-  };
-
   return (
     <div style={{
       minHeight: '100vh',
