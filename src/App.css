@@ -1,3 +1,4 @@
+/* Root styles */
 #root {
   max-width: 1280px;
   margin: 0 auto;
@@ -11,9 +12,11 @@
   will-change: filter;
   transition: filter 300ms;
 }
+
 .logo:hover {
   filter: drop-shadow(0 0 2em #646cffaa);
 }
+
 .logo.react:hover {
   filter: drop-shadow(0 0 2em #61dafbaa);
 }
@@ -39,4 +42,211 @@
 
 .read-the-docs {
   color: #888;
+}
+
+/* Modal Popup Animation */
+@keyframes modalPopIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Mobile Responsive Styles for Admin Dashboard */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100% !important;
+    position: relative !important;
+    height: auto !important;
+    transform: none !important;
+  }
+  
+  .main-content {
+    margin-left: 0 !important;
+    padding: 16px !important;
+  }
+  
+  .top-bar {
+    flex-direction: column;
+    align-items: flex-start !important;
+  }
+  
+  .btn-group {
+    width: 100%;
+    justify-content: space-between;
+  }
+  
+  .btn-group button {
+    flex: 1;
+    font-size: 0.8rem;
+    padding: 8px 12px !important;
+  }
+  
+  .search-bar {
+    flex-direction: column;
+  }
+  
+  .search-bar input {
+    width: 100% !important;
+  }
+  
+  /* Card layout for mobile */
+  .desktop-table {
+    display: none;
+  }
+  
+  .mobile-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .warranty-card, 
+  .contact-card {
+    background: #0C0C12;
+    border: 1px solid rgba(229,9,20,0.2);
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  
+  .warranty-card-header, 
+  .contact-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(229,9,20,0.3);
+  }
+  
+  .warranty-id, 
+  .contact-name {
+    font-weight: bold;
+    color: #E50914;
+    font-family: 'Orbitron', monospace;
+    font-size: 0.9rem;
+  }
+  
+  .status-badge-mobile {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: bold;
+  }
+  
+  .warranty-detail, 
+  .contact-detail {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 0.8rem;
+    border-bottom: 1px solid #1a1a22;
+  }
+  
+  .detail-label {
+    color: #aaa;
+    font-weight: 500;
+  }
+  
+  .detail-value {
+    color: #fff;
+    text-align: right;
+    word-break: break-word;
+    max-width: 60%;
+  }
+  
+  .card-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 8px;
+    justify-content: flex-end;
+  }
+  
+  .modal-card {
+    width: 95% !important;
+    padding: 20px !important;
+  }
+  
+  .form-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .view-modal-content {
+    width: 95% !important;
+    margin: 10px !important;
+  }
+}
+
+/* Desktop styles - hide mobile cards, show desktop table */
+@media (min-width: 769px) {
+  .mobile-cards {
+    display: none;
+  }
+  .desktop-table {
+    display: block;
+  }
+}
+
+/* Fix for iOS input zoom */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #1a1a22;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #E50914;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #ff1a2c;
+}
+/* Mobile horizontal scroll */
+@media (max-width: 768px) {
+  .table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Optional: Add a visual indicator that it's scrollable */
+  .table-wrapper::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  .table-wrapper::-webkit-scrollbar-track {
+    background: #1a1a22;
+    border-radius: 4px;
+  }
+  
+  .table-wrapper::-webkit-scrollbar-thumb {
+    background: #E50914;
+    border-radius: 4px;
+  }
 }
