@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { signIn, confirmSignIn, resetPassword, confirmResetPassword, signOut } from 'aws-amplify/auth';
 import '@aws-amplify/ui-react/styles.css';
 
@@ -11,7 +11,15 @@ const PasswordInput = ({
   showPassword, 
   setShowPassword,
   style = {}
-}: any) => {
+}: {
+  value: string;
+  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  placeholder: string;
+  required: boolean;
+  showPassword: boolean;
+  setShowPassword: (value: boolean) => void;
+  style?: React.CSSProperties;
+}) => {
   return (
     <div style={{ position: 'relative', width: '100%', marginBottom: '15px', ...style }}>
       <input
@@ -32,12 +40,12 @@ const PasswordInput = ({
           outline: 'none',
           transition: 'border-color 0.2s'
         }}
-        onFocus={(e) => e.target.style.borderColor = '#E50914'}
-        onBlur={(e) => e.target.style.borderColor = '#333'}
+        onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = '#E50914'}
+        onBlur={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = '#333'}
       />
       <button
         type="button"
-        onClick={(e) => {
+        onClick={(e: React.MouseEvent) => {
           e.preventDefault();
           setShowPassword(!showPassword);
         }}
@@ -69,7 +77,7 @@ export const AdminLoginPage: React.FC = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
   
   // Password visibility states
   const [showPassword, setShowPassword] = useState(false);
@@ -77,7 +85,7 @@ export const AdminLoginPage: React.FC = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   // Handle normal login with email + password + OTP
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
@@ -127,7 +135,7 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   // Verify OTP and complete login
-  const handleVerifyOTP = async (e: React.FormEvent) => {
+  const handleVerifyOTP = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
@@ -153,7 +161,7 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   // Step 1: Send password reset OTP
-  const handleSendResetOTP = async (e: React.FormEvent) => {
+  const handleSendResetOTP = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!email) {
       setMessage({ type: 'error', text: 'Please enter your email address.' });
@@ -182,7 +190,7 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   // Step 2: Validate OTP
-  const handleValidateOTP = async (e: React.FormEvent) => {
+  const handleValidateOTP = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!otp) {
       setMessage({ type: 'error', text: 'Please enter the OTP code.' });
@@ -204,7 +212,7 @@ export const AdminLoginPage: React.FC = () => {
   };
 
   // Step 3: Set new password
-  const handleSetNewPassword = async (e: React.FormEvent) => {
+  const handleSetNewPassword = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     if (newPassword !== confirmNewPassword) {
@@ -242,6 +250,13 @@ export const AdminLoginPage: React.FC = () => {
       setMessage({ type: 'error', text: error.message || 'Failed to reset password. Please try again.' });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRegChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    if (e.target.name === 'fullName') {
+      // This would be used if you have a registration form
+      console.log('Full name changed:', e.target.value);
     }
   };
 
@@ -288,7 +303,7 @@ export const AdminLoginPage: React.FC = () => {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
               placeholder="Enter your email"
               required
               style={{
@@ -302,12 +317,12 @@ export const AdminLoginPage: React.FC = () => {
                 marginBottom: '15px',
                 outline: 'none'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#E50914'}
-              onBlur={(e) => e.target.style.borderColor = '#333'}
+              onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = '#E50914'}
+              onBlur={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = '#333'}
             />
             <PasswordInput
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
               placeholder="Enter your password"
               required={true}
               showPassword={showPassword}
@@ -355,7 +370,7 @@ export const AdminLoginPage: React.FC = () => {
             <input
               type="text"
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOtp(e.target.value)}
               placeholder="Enter 6-digit OTP"
               maxLength={6}
               required
@@ -373,8 +388,8 @@ export const AdminLoginPage: React.FC = () => {
                 letterSpacing: '4px',
                 outline: 'none'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#E50914'}
-              onBlur={(e) => e.target.style.borderColor = '#333'}
+              onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = '#E50914'}
+              onBlur={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = '#333'}
             />
             <button
               type="submit"
@@ -421,7 +436,7 @@ export const AdminLoginPage: React.FC = () => {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
               placeholder="Enter your email address"
               required
               autoFocus
@@ -436,8 +451,8 @@ export const AdminLoginPage: React.FC = () => {
                 marginBottom: '20px',
                 outline: 'none'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#E50914'}
-              onBlur={(e) => e.target.style.borderColor = '#333'}
+              onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = '#E50914'}
+              onBlur={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = '#333'}
             />
             <button
               type="submit"
@@ -488,7 +503,7 @@ export const AdminLoginPage: React.FC = () => {
             <input
               type="text"
               value={otp}
-              onChange={(e) => setOtp(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setOtp(e.target.value)}
               placeholder="Enter 6-digit OTP"
               maxLength={6}
               required
@@ -506,8 +521,8 @@ export const AdminLoginPage: React.FC = () => {
                 letterSpacing: '4px',
                 outline: 'none'
               }}
-              onFocus={(e) => e.target.style.borderColor = '#E50914'}
-              onBlur={(e) => e.target.style.borderColor = '#333'}
+              onFocus={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = '#E50914'}
+              onBlur={(e: React.FocusEvent<HTMLInputElement>) => e.target.style.borderColor = '#333'}
             />
             <button
               type="submit"
@@ -558,7 +573,7 @@ export const AdminLoginPage: React.FC = () => {
             </div>
             <PasswordInput
               value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setNewPassword(e.target.value)}
               placeholder="New password"
               required={true}
               showPassword={showNewPassword}
@@ -566,7 +581,7 @@ export const AdminLoginPage: React.FC = () => {
             />
             <PasswordInput
               value={confirmNewPassword}
-              onChange={(e) => setConfirmNewPassword(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setConfirmNewPassword(e.target.value)}
               placeholder="Re-enter new password"
               required={true}
               showPassword={showConfirmPassword}
@@ -619,8 +634,9 @@ export const AdminLoginPage: React.FC = () => {
             marginTop: '20px',
             padding: '12px',
             borderRadius: '12px',
-            background: message.type === 'error' ? 'rgba(231, 76, 60, 0.2)' : 'rgba(46, 204, 113, 0.2)',
-            color: message.type === 'error' ? '#e74c3c' : '#2ecc71'
+            background: message.type === 'error' ? 'rgba(231, 76, 60, 0.2)' : message.type === 'success' ? 'rgba(46, 204, 113, 0.2)' : 'rgba(52, 152, 219, 0.2)',
+            border: `1px solid ${message.type === 'error' ? '#e74c3c' : message.type === 'success' ? '#2ecc71' : '#3498db'}`,
+            color: message.type === 'error' ? '#e74c3c' : message.type === 'success' ? '#2ecc71' : '#3498db'
           }}>
             {message.text}
           </div>
