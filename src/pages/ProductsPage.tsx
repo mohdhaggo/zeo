@@ -29,7 +29,9 @@ export const ProductsPage: React.FC = () => {
 
   return (
     <div className="products-responsive-wrapper">
-      <PageHeader />
+      <div className="page-header-wrapper fade-section">
+        <PageHeader />
+      </div>
       <div className="products-content-container">
         <CategoryGrid />
         
@@ -53,6 +55,51 @@ export const ProductsPage: React.FC = () => {
         .products-responsive-wrapper {
           width: 100%;
           overflow-x: hidden;
+        }
+        
+        /* Page Header Wrapper - Mobile Responsive Fix */
+        .page-header-wrapper {
+          width: 100%;
+          overflow-x: hidden;
+        }
+        
+        /* Override any PageHeader internal styles to ensure no text chopping */
+        .page-header-wrapper [class*="header"],
+        .page-header-wrapper [class*="hero"],
+        .page-header-wrapper [class*="banner"] {
+          padding-left: clamp(12px, 4vw, 30px) !important;
+          padding-right: clamp(12px, 4vw, 30px) !important;
+          box-sizing: border-box !important;
+          max-width: 100% !important;
+          overflow-x: hidden !important;
+        }
+        
+        /* Fix for any text elements inside PageHeader */
+        .page-header-wrapper h1,
+        .page-header-wrapper h2,
+        .page-header-wrapper p,
+        .page-header-wrapper span,
+        .page-header-wrapper div {
+          max-width: 100%;
+          word-wrap: break-word;
+          white-space: normal;
+        }
+        
+        /* Specific fix for main title in PageHeader */
+        .page-header-wrapper h1 {
+          font-size: clamp(1.8rem, 6vw, 3rem) !important;
+          line-height: 1.2 !important;
+          padding: 0 clamp(10px, 3vw, 20px) !important;
+          text-align: center !important;
+        }
+        
+        /* Fix for subtitle/description text */
+        .page-header-wrapper p {
+          font-size: clamp(0.9rem, 3.5vw, 1.1rem) !important;
+          line-height: 1.5 !important;
+          padding: 0 clamp(15px, 4vw, 30px) !important;
+          margin: 10px auto !important;
+          max-width: 90% !important;
         }
         
         .products-content-container {
@@ -146,6 +193,23 @@ export const ProductsPage: React.FC = () => {
           .feature-card:active {
             transform: scale(0.98);
           }
+          
+          /* Additional mobile fixes for PageHeader */
+          .page-header-wrapper {
+            padding-top: clamp(20px, 5vw, 40px);
+            padding-bottom: clamp(20px, 5vw, 40px);
+          }
+          
+          .page-header-wrapper h1 {
+            font-size: clamp(1.5rem, 5vw, 2.2rem) !important;
+            padding: 0 15px !important;
+          }
+          
+          .page-header-wrapper p {
+            font-size: clamp(0.85rem, 3vw, 1rem) !important;
+            padding: 0 20px !important;
+            max-width: 95% !important;
+          }
         }
         
         /* Small mobile */
@@ -157,6 +221,22 @@ export const ProductsPage: React.FC = () => {
           .products-title {
             margin-top: 30px;
           }
+          
+          /* Small screen fixes for PageHeader */
+          .page-header-wrapper h1 {
+            font-size: clamp(1.3rem, 6vw, 1.8rem) !important;
+            padding: 0 12px !important;
+          }
+          
+          .page-header-wrapper p {
+            font-size: clamp(0.8rem, 4vw, 0.9rem) !important;
+            padding: 0 15px !important;
+          }
+          
+          .page-header-wrapper {
+            padding-top: 15px;
+            padding-bottom: 15px;
+          }
         }
         
         /* Tablet */
@@ -165,12 +245,25 @@ export const ProductsPage: React.FC = () => {
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 25px;
           }
+          
+          .page-header-wrapper h1 {
+            font-size: clamp(2rem, 5vw, 2.8rem) !important;
+          }
         }
         
         /* Landscape mobile */
         @media (max-width: 768px) and (orientation: landscape) {
           .feature-grid {
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+          }
+          
+          .page-header-wrapper {
+            padding-top: 10px;
+            padding-bottom: 10px;
+          }
+          
+          .page-header-wrapper h1 {
+            font-size: clamp(1.2rem, 4vw, 1.6rem) !important;
           }
         }
         
@@ -208,6 +301,11 @@ export const ProductsPage: React.FC = () => {
           .feature-card {
             min-height: 44px;
           }
+        }
+        
+        /* Ensure text never gets chopped on any screen */
+        * {
+          word-break: break-word;
         }
       `}</style>
     </div>
