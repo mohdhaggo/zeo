@@ -51,7 +51,8 @@ export const Navbar: React.FC = () => {
           gap: '36px',
           listStyle: 'none',
           margin: 0,
-          padding: 0
+          padding: '10px 15px 15px',
+          alignItems: 'center'
         }}>
           {navLinks.map((link) => (
             <li key={link.path}>

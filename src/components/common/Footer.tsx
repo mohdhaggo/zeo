@@ -21,8 +21,7 @@ export const Footer: React.FC = () => {
           </div>
           <div className="footer-links" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <h4 style={{ marginBottom: '16px' }}>Quick Links</h4>
-            <a href="/warranty" style={{ color: '#AAA', textDecoration: 'none', fontSize: '0.9rem' }}>Warranty Validation</a>
-            <a href="/privacy-policy" style={{ color: '#AAA', textDecoration: 'none', fontSize: '0.9rem' }}>Privacy Policy</a>
+            <a href="/warranty" style={{ color: '#AAA', textDecoration: 'none', fontSize: '0.9rem' }}>Warranty Policy & Validation</a>
             <a href="/terms-conditions" style={{ color: '#AAA', textDecoration: 'none', fontSize: '0.9rem' }}>Terms & Conditions</a>
             <a href="/contact" style={{ color: '#AAA', textDecoration: 'none', fontSize: '0.9rem' }}>Contact Distributors</a>
           </div>
@@ -34,7 +33,7 @@ export const Footer: React.FC = () => {
           </div>
           <div className="footer-links" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <h4 style={{ marginBottom: '16px' }}>Follow Us</h4>
-            <div style={{ display: 'flex', gap: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'row', gap: '12px' }}>
               <a href="#"><i className="fab fa-instagram fa-lg"></i></a>
               <a href="#"><i className="fab fa-x-twitter fa-lg"></i></a>
               <a href="#"><i className="fab fa-tiktok fa-lg"></i></a>
