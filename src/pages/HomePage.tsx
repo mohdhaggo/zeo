@@ -120,7 +120,6 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
 
-
       <section className="hero">
         <div className="hero-bg"></div>
         <div className="container">
