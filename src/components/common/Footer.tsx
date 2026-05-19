@@ -33,7 +33,7 @@ export const Footer: React.FC = () => {
           </div>
           <div className="footer-links" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <h4 style={{ marginBottom: '16px' }}>Follow Us</h4>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: '12px' }}>
+            <div style={{display: 'flex', gap: '12px', justifyContent: 'center'}}>
               <a href="#"><i className="fab fa-instagram fa-lg"></i></a>
               <a href="#"><i className="fab fa-x-twitter fa-lg"></i></a>
               <a href="#"><i className="fab fa-tiktok fa-lg"></i></a>
