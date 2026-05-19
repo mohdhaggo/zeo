@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '../../amplify/data/resource';
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz0ujxYOjbNvBfG48IWdu7qFx3jHS88_Vin8NCVnXFj1CYozlg33EgMQ_cYnh__V61cBw/exec';
+const client = generateClient<Schema>();
 
 export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -111,28 +113,39 @@ export const ContactPage: React.FC = () => {
     setLoading(true);
     
     try {
-      // Use image request to bypass CORS
-      const img = new Image();
-      const url = `${APPS_SCRIPT_URL}?action=submit&full_name=${encodeURIComponent(formData.name)}&email=${encodeURIComponent(formData.email)}&phone=${encodeURIComponent(formData.phone)}&region=${encodeURIComponent(formData.region)}&product_interest=${encodeURIComponent(formData.interest)}&message=${encodeURIComponent(formData.message)}&t=${Date.now()}`;
+      // Save to AWS Amplify/DynamoDB
+      const { errors } = await client.models.ContactSubmission.create({
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        region: formData.region,
+        interest: formData.interest,
+        message: formData.message,
+        status: 'PENDING',
+        createdAt: new Date().toISOString()
+      });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
       
-      img.onload = () => {
-        setLoading(false);
-        setFormData({ name: '', email: '', phone: '', region: '', interest: '', message: '' });
-        generateCaptcha();
-        setShowSuccessModal(true);
-      };
+      // Reset form
+      setFormData({ 
+        name: '', 
+        email: '', 
+        phone: '', 
+        region: '', 
+        interest: '', 
+        message: '' 
+      });
+      generateCaptcha();
+      setShowSuccessModal(true);
       
-      img.onerror = () => {
-        setLoading(false);
-        setFormData({ name: '', email: '', phone: '', region: '', interest: '', message: '' });
-        generateCaptcha();
-        setShowSuccessModal(true);
-      };
-      
-      img.src = url;
-    } catch (error) {
+    } catch (error: any) {
+      console.error('Error submitting contact form:', error);
+      setMessage({ type: 'error', text: error.message || 'Failed to send message. Please try again.' });
+    } finally {
       setLoading(false);
-      setMessage({ type: 'error', text: 'Failed to send message. Please try again.' });
     }
   };
 
@@ -146,7 +159,7 @@ export const ContactPage: React.FC = () => {
         alignItems: 'center',
         justifyContent: 'center',
         textAlign: 'center',
-        background: 'linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 100%)' ,
+        background: 'linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 100%)',
         borderBottom: '2px solid #E50914'
       }}>
         <div className="container" style={{ position: 'relative', zIndex: 2, padding: '100px 30px' }}>

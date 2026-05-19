@@ -1,0 +1,27 @@
+/* Custom Authenticator Styles for Zeo Admin */
+[data-amplify-authenticator] {
+  --amplify-components-authenticator-router-border-width: 0;
+  --amplify-components-fieldcontrol-background-color: #1A1A22;
+  --amplify-components-fieldcontrol-border-color: #333;
+  --amplify-components-fieldcontrol-color: white;
+  --amplify-components-fieldcontrol-border-radius: 40px;
+  --amplify-components-fieldcontrol-padding-block: 14px;
+  --amplify-components-fieldcontrol-padding-inline: 18px;
+  --amplify-components-button-primary-background-color: #E50914;
+  --amplify-components-button-primary-border-color: #E50914;
+  --amplify-components-button-primary-color: white;
+  --amplify-components-button-primary-hover-background-color: #ff1a2c;
+  --amplify-components-button-link-color: #E50914;
+  --amplify-components-tabs-item-active-border-color: #E50914;
+  --amplify-components-tabs-item-active-color: #E50914;
+  --amplify-components-tabs-item-color: #aaa;
+}
+
+[data-amplify-authenticator] button {
+  font-family: 'Orbitron', monospace !important;
+  border-radius: 40px !important;
+}
+
+[data-amplify-authenticator] input {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}

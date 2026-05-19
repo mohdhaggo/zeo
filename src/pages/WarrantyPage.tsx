@@ -1,18 +1,21 @@
 import React, { useState, useEffect } from 'react';
+import { generateClient } from 'aws-amplify/data';
+import type { Schema } from '../../amplify/data/resource';
 
-const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtZxdLQOKSJiMYtzeWfsef9WYugiyW9Wuy7aq5Ux9nkJEBGQ944MBQM73T70mKQfH3/exec';
+const client = generateClient<Schema>();
 
 interface WarrantyData {
-  warranty_id: string;
-  product_type: string;
-  manufacture_date: string;
-  status?: string;
-  registered_to?: string;
-  registration_date?: string;
-  mobile_number?: string;
-  email_id?: string;
-  purchase_date?: string;
-  purchase_country?: string;
+  id: string;
+  warrantyNumber: string;
+  productName: string;
+  manufactureDate: string;
+  status: string;
+  registrationDate: string;
+  customerName: string;
+  phone: string;
+  email: string;
+  purchaseDate: string;
+  purchaseCountry: string;
 }
 
 export const WarrantyPage: React.FC = () => {
@@ -40,70 +43,122 @@ export const WarrantyPage: React.FC = () => {
     }, { threshold: 0.1 });
     
     fadeElements.forEach(el => observer.observe(el));
-    
     return () => observer.disconnect();
   }, []);
 
-  const checkWarrantyAPI = async (id: string) => {
-    const url = `${APPS_SCRIPT_URL}?action=check&warrantyId=${encodeURIComponent(id)}`;
-    const response = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
-  };
-
-  const registerWarrantyAPI = async (registrationData: any) => {
-    const params = new URLSearchParams({
-      action: 'register',
-      warranty_id: registrationData.warranty_id,
-      registered_to: registrationData.registered_to,
-      mobile_number: registrationData.mobile_number,
-      email_id: registrationData.email_id,
-      purchase_country: registrationData.purchase_country,
-      purchase_date: registrationData.purchase_date || new Date().toISOString().split('T')[0]
-    });
-    const url = `${APPS_SCRIPT_URL}?${params.toString()}`;
-    const response = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
-    return await response.json();
-  };
-
-  const validateWarranty = async () => {
-    if (!warrantyId.trim()) {
-      setMessage({ text: '⚠️ Please enter a Warranty ID.', type: 'error' });
-      return;
-    }
-
+  // Check warranty using AWS Amplify
+  const checkWarranty = async (warrantyNumber: string) => {
     setLoading(true);
     setMessage(null);
     setWarrantyDetails(null);
 
     try {
-      const result = await checkWarrantyAPI(warrantyId);
+      // List all warranties and find by warrantyNumber
+      const { data, errors } = await client.models.Warranty.list();
       
-      if (!result.success) {
-        setMessage({ text: `❌ ${result.message}`, type: 'error' });
-        setWarrantyDetails(null);
-      } else {
-        const warranty = result.data;
-        setWarrantyDetails(warranty);
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+
+      const warranty = data?.find(w => 
+        w.warrantyNumber?.toLowerCase() === warrantyNumber.toLowerCase()
+      );
+
+      if (warranty) {
+        const warrantyData: WarrantyData = {
+          id: warranty.id,
+          warrantyNumber: warranty.warrantyNumber,
+          productName: warranty.productName,
+          manufactureDate: warranty.manufactureDate || '-',
+          status: warranty.status || 'UNREGISTERED',
+          registrationDate: warranty.registrationDate || '-',
+          customerName: warranty.customerName || '-',
+          phone: warranty.phone || '-',
+          email: warranty.email || '-',
+          purchaseDate: warranty.purchaseDate || '-',
+          purchaseCountry: warranty.purchaseCountry || '-'
+        };
         
-        const isRegistered = warranty.status === 'registered' || 
-                           (warranty.registered_to && warranty.registered_to.trim() !== '');
+        setWarrantyDetails(warrantyData);
+        
+        const isRegistered = warranty.status === 'ACTIVE';
         
         if (isRegistered) {
           setMessage({ text: '✅ This warranty is already registered.', type: 'success' });
         } else {
           setMessage({ text: '✅ Valid warranty! This product is eligible for registration.', type: 'success' });
         }
+      } else {
+        setMessage({ text: '❌ Warranty ID not found in the system.', type: 'error' });
       }
-    } catch (error) {
-      setMessage({ text: '❌ Connection error. Please try again.', type: 'error' });
+    } catch (error: any) {
+      console.error('Error checking warranty:', error);
+      setMessage({ text: `❌ ${error.message || 'Connection error. Please try again.'}`, type: 'error' });
     } finally {
       setLoading(false);
     }
   };
 
+  // Register warranty using AWS Amplify
+  const registerWarranty = async () => {
+    if (!warrantyDetails) {
+      setMessage({ text: 'Please validate a warranty first.', type: 'error' });
+      return;
+    }
+
+    const { fullName, mobile, email, country, purchaseDate } = regFormData;
+    
+    if (!fullName || !mobile || !email || !country) {
+      setMessage({ text: 'Please fill in all required fields.', type: 'error' });
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setMessage({ text: 'Please enter a valid email address.', type: 'error' });
+      return;
+    }
+
+    setLoading(true);
+    
+    try {
+      const { errors } = await client.models.Warranty.update({
+        id: warrantyDetails.id,
+        customerName: fullName,
+        phone: mobile,
+        email: email,
+        purchaseCountry: country,
+        purchaseDate: purchaseDate || new Date().toISOString().split('T')[0],
+        status: 'ACTIVE',
+        registrationDate: new Date().toISOString()
+      });
+
+      if (errors) {
+        throw new Error(errors[0].message);
+      }
+      
+      setShowModal(false);
+      setSuccessData({ warrantyId: warrantyDetails.warrantyNumber, registeredTo: fullName });
+      setShowSuccessModal(true);
+      handleReset();
+      
+    } catch (error: any) {
+      console.error('Error registering warranty:', error);
+      setMessage({ text: `Registration failed: ${error.message}`, type: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleReset = () => {
+    setWarrantyId('');
+    setMessage(null);
+    setWarrantyDetails(null);
+    setRegFormData({ fullName: '', mobile: '', email: '', country: '', purchaseDate: '' });
+  };
+
   const formatDateOnly = (dateString: string | undefined) => {
-    if (!dateString) return 'N/A';
+    if (!dateString || dateString === '-') return 'N/A';
     try {
       const date = new Date(dateString);
       if (isNaN(date.getTime())) return dateString.split(' ')[0];
@@ -118,69 +173,22 @@ export const WarrantyPage: React.FC = () => {
       setMessage({ text: 'Please validate a warranty first.', type: 'error' });
       return;
     }
-    const isRegistered = warrantyDetails.status === 'registered' || 
-                        (warrantyDetails.registered_to && warrantyDetails.registered_to.trim() !== '');
-    if (isRegistered) {
+    if (warrantyDetails.status === 'ACTIVE') {
       setMessage({ text: 'This warranty is already registered.', type: 'error' });
       return;
     }
-    setRegFormData({ fullName: '', mobile: '', email: '', country: '', purchaseDate: '' });
+    setRegFormData({ 
+      fullName: '', 
+      mobile: '', 
+      email: warrantyDetails.email !== '-' ? warrantyDetails.email : '', 
+      country: warrantyDetails.purchaseCountry !== '-' ? warrantyDetails.purchaseCountry : '', 
+      purchaseDate: warrantyDetails.purchaseDate !== '-' ? warrantyDetails.purchaseDate : '' 
+    });
     setShowModal(true);
   };
 
   const handleRegChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setRegFormData({ ...regFormData, [e.target.name]: e.target.value });
-  };
-
-  const validateEmail = (email: string) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const submitRegistration = async () => {
-    const { fullName, mobile, email, country, purchaseDate } = regFormData;
-    
-    if (!fullName || !mobile || !email || !country) {
-      setMessage({ text: 'Please fill in all required fields.', type: 'error' });
-      return;
-    }
-    
-    if (!validateEmail(email)) {
-      setMessage({ text: 'Please enter a valid email address.', type: 'error' });
-      return;
-    }
-
-    setLoading(true);
-    
-    try {
-      const result = await registerWarrantyAPI({
-        warranty_id: warrantyDetails!.warranty_id,
-        registered_to: fullName,
-        mobile_number: mobile,
-        email_id: email,
-        purchase_country: country,
-        purchase_date: purchaseDate
-      });
-      
-      if (result.success) {
-        setShowModal(false);
-        setSuccessData({ warrantyId: warrantyDetails!.warranty_id, registeredTo: fullName });
-        setShowSuccessModal(true);
-        handleReset();
-      } else {
-        setMessage({ text: `Registration failed: ${result.message}`, type: 'error' });
-      }
-    } catch (error) {
-      setMessage({ text: 'Registration failed. Please try again.', type: 'error' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleReset = () => {
-    setWarrantyId('');
-    setMessage(null);
-    setWarrantyDetails(null);
-    setRegFormData({ fullName: '', mobile: '', email: '', country: '', purchaseDate: '' });
   };
 
   return (
@@ -234,7 +242,7 @@ export const WarrantyPage: React.FC = () => {
               type="text"
               value={warrantyId}
               onChange={(e) => setWarrantyId(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && validateWarranty()}
+              onKeyPress={(e) => e.key === 'Enter' && checkWarranty(warrantyId)}
               placeholder="Enter Warranty ID (e.g., PPF-00-12345)"
               style={{
                 flex: '2',
@@ -251,7 +259,7 @@ export const WarrantyPage: React.FC = () => {
               disabled={loading}
             />
             <button
-              onClick={validateWarranty}
+              onClick={() => checkWarranty(warrantyId)}
               disabled={loading}
               style={{
                 padding: '14px 32px',
@@ -309,17 +317,17 @@ export const WarrantyPage: React.FC = () => {
               </h3>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
                 <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Warranty ID:</span>
-                <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.warranty_id}</span>
+                <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.warrantyNumber}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
                 <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Product Type:</span>
-                <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.product_type || 'N/A'}</span>
+                <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.productName}</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
                 <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Manufacture Date:</span>
-                <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.manufacture_date)}</span>
+                <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.manufactureDate)}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
                 <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Status:</span>
                 <span style={{
                   display: 'inline-block',
@@ -327,38 +335,38 @@ export const WarrantyPage: React.FC = () => {
                   borderRadius: '20px',
                   fontSize: '0.75rem',
                   fontWeight: 'bold',
-                  background: (warrantyDetails.status === 'registered' || (warrantyDetails.registered_to && warrantyDetails.registered_to.trim() !== '')) ? '#4caf50' : '#ffc107',
-                  color: (warrantyDetails.status === 'registered' || (warrantyDetails.registered_to && warrantyDetails.registered_to.trim() !== '')) ? 'white' : '#000'
+                  background: warrantyDetails.status === 'ACTIVE' ? '#4caf50' : '#ffc107',
+                  color: warrantyDetails.status === 'ACTIVE' ? 'white' : '#000'
                 }}>
-                  {(warrantyDetails.status === 'registered' || (warrantyDetails.registered_to && warrantyDetails.registered_to.trim() !== '')) ? '✓ Registered' : '⏱ Not Registered'}
+                  {warrantyDetails.status === 'ACTIVE' ? '✓ Registered' : '⏱ Not Registered'}
                 </span>
               </div>
               
-              {(warrantyDetails.status === 'registered' || (warrantyDetails.registered_to && warrantyDetails.registered_to.trim() !== '')) && (
+              {warrantyDetails.status === 'ACTIVE' && (
                 <>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '1px solid #2a2a2a', marginTop: '10px', paddingTop: '15px' }}>
                     <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Registration Date:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.registration_date)}</span>
+                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.registrationDate)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
                     <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Registered To:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.registered_to}</span>
+                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.customerName}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
                     <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Mobile Number:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.mobile_number}</span>
+                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.phone}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
                     <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Email ID:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.email_id}</span>
+                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.email}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
                     <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Purchase Date:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.purchase_date)}</span>
+                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.purchaseDate)}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
                     <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Purchase Country:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.purchase_country}</span>
+                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.purchaseCountry}</span>
                   </div>
                 </>
               )}
@@ -368,7 +376,7 @@ export const WarrantyPage: React.FC = () => {
           {/* Action Buttons */}
           {warrantyDetails && (
             <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '20px' }}>
-              {!(warrantyDetails.status === 'registered' || (warrantyDetails.registered_to && warrantyDetails.registered_to.trim() !== '')) && (
+              {warrantyDetails.status !== 'ACTIVE' && (
                 <button onClick={openRegistrationModal} style={{
                   padding: '12px 28px',
                   borderRadius: '40px',
@@ -530,7 +538,7 @@ export const WarrantyPage: React.FC = () => {
             </div>
             
             <div style={{ display: 'flex', gap: '14px', marginTop: '24px' }}>
-              <button onClick={submitRegistration} disabled={loading} style={{
+              <button onClick={registerWarranty} disabled={loading} style={{
                 flex: 1,
                 padding: '12px',
                 borderRadius: '40px',

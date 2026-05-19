@@ -41,7 +41,7 @@ export const TitanSatinPPFPage: React.FC = () => {
     if (autoplayRef.current) window.clearInterval(autoplayRef.current);
     autoplayRef.current = window.setInterval(() => {
       if (!isHovering) setActiveIndex((prev) => (prev + 1) % galleryImages.length);
-    }, 5000);
+    }, 2000);
     return () => {
       if (autoplayRef.current) window.clearInterval(autoplayRef.current);
     };
@@ -271,7 +271,7 @@ export const TitanSatinPPFPage: React.FC = () => {
         .carousel-dots { display: flex; justify-content: center; gap: 0.75rem; margin-top: 1rem; }
         .dot { width: 2rem; height: 0.25rem; background: #333; border-radius: 0.25rem; cursor: pointer; transition: all 0.3s; }
         .dot.active { background: #E50914; width: 3rem; }
-        .carousel-arrows { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; }
+        .carousel-arrows { display: flex; justify-content: center; gap: 20px; margin-top: 40px; width: 100%; }
         .carousel-arrow { width: 2.7rem; height: 2.7rem; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background-color 0.3s, transform 0.2s; border: none; background-color: #141414; color: #f1f1f7; }
         .carousel-arrow:hover { transform: scale(1.05); background-color: #E50914; color: white; }
         .product-info p { line-height: 1.7; color: #bbb; margin-bottom: 20px; }
