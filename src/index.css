@@ -474,7 +474,6 @@ h1, h2, h3, .logo-font, .nav-link, .btn, .card-category {
 }
 
 .product-badge {
-  position: absolute;
   top: 15px;
   right: 15px;
   background: #E50914;

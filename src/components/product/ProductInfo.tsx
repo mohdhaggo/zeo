@@ -19,6 +19,7 @@ export const ProductInfo: React.FC<ProductInfoProps> = ({ description, thickness
             background: '#1a1a1a',
             padding: '8px 20px',
             borderRadius: '30px',
+            textAlign: 'left',
             fontSize: '0.9rem',
             border: '1px solid #E50914',
             fontFamily: "'Orbitron', monospace"

@@ -228,25 +228,3 @@ html {
 ::-webkit-scrollbar-thumb:hover {
   background: #ff1a2c;
 }
-/* Mobile horizontal scroll */
-@media (max-width: 768px) {
-  .table-wrapper {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  
-  /* Optional: Add a visual indicator that it's scrollable */
-  .table-wrapper::-webkit-scrollbar {
-    height: 4px;
-  }
-  
-  .table-wrapper::-webkit-scrollbar-track {
-    background: #1a1a22;
-    border-radius: 4px;
-  }
-  
-  .table-wrapper::-webkit-scrollbar-thumb {
-    background: #E50914;
-    border-radius: 4px;
-  }
-}

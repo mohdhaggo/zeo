@@ -17,7 +17,7 @@ export const PPFPage: React.FC = () => {
   const products = [
     { name: 'TITAN PPF', shortDesc: 'Maximum protection PPF with 10-year durability', imgUrl: '/01-titan-ppf-white.webp', badge: '10 YEAR WARRANTY', url: '/titan-ppf' },
     { name: 'ULTRA PPF', shortDesc: 'Reliable protection with advanced technology', imgUrl: '/01-ultra-ppf-red.webp', badge: '5 YEAR WARRANTY', url: '/ultra-ppf' },
-    { name: 'TITAN SATIN PPF', shortDesc: 'Premium satin finish with ultimate protection', imgUrl: '/01-stain-ppf-blue.webp', badge: 'SATIN FINISH', url: '/titan-satin-ppf' }
+    { name: 'TITAN SATIN PPF', shortDesc: 'Premium satin finish with ultimate protection', imgUrl: '/01-stain-ppf-blue.webp', badge: '10 YEAR WARRANTY', url: '/titan-satin-ppf' }
   ];
 
   const handleProductClick = (url: string) => {
@@ -50,7 +50,7 @@ export const PPFPage: React.FC = () => {
           {products.map((product, index) => (
             <div key={index} onClick={() => handleProductClick(product.url)} style={{ background: '#0C0C12', borderRadius: '32px', overflow: 'hidden', transition: 'all 0.35s ease', borderBottom: '3px solid transparent', cursor: 'pointer' }}>
               <div style={{ height: '260px', backgroundSize: 'cover', backgroundPosition: 'center', backgroundImage: `url('${product.imgUrl}')`, position: 'relative' }}>
-                <div style={{ position: 'absolute', top: '15px', right: '15px', background: product.badge === 'SATIN FINISH' ? '#8A8A8A' : '#E50914', padding: '6px 14px', borderRadius: '30px', fontSize: '0.7rem', fontWeight: 'bold' }}>
+                <div style={{ position: 'absolute', top: '15px', right: '15px', background: product.badge === 'SATIN FINISH' ? '#E50914' : '#E50914', padding: '6px 14px', borderRadius: '30px', fontSize: '0.7rem', fontWeight: 'bold' }}>
                   {product.badge}
                 </div>
               </div>

@@ -16,6 +16,7 @@ export const ProductHero: React.FC<ProductHeroProps> = ({ title, badge, descript
         borderRadius: '30px',
         fontSize: '0.8rem',
         marginBottom: '20px',
+        textAlign: 'left',
         borderLeft: '3px solid #E50914',
         fontFamily: "'Orbitron', monospace"
       }}>

@@ -162,29 +162,49 @@ export const ContactPage: React.FC = () => {
         background: 'linear-gradient(135deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 100%)',
         borderBottom: '2px solid #E50914'
       }}>
-        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '100px 30px' }}>
-          <h1 style={{ fontSize: '3.5rem', marginBottom: '15px', background: 'linear-gradient(135deg, #E50914, #FF6B6B)', WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Get In Touch</h1>
-          <p style={{ fontSize: '1.2rem', color: '#ddd', maxWidth: '600px', margin: '0 auto' }}>Our global team is ready to assist you with premium automotive protection solutions across the Middle East, Asia, and beyond.</p>
+        <div className="container" style={{ position: 'relative', zIndex: 2, padding: '100px 20px' }}>
+          <h1 style={{ 
+            fontSize: 'clamp(2rem, 8vw, 3.5rem)', 
+            marginBottom: '15px', 
+            background: 'linear-gradient(135deg, #E50914, #FF6B6B)', 
+            WebkitBackgroundClip: 'text', 
+            backgroundClip: 'text', 
+            WebkitTextFillColor: 'transparent',
+            padding: '0 15px'
+          }}>Get In Touch</h1>
+          <p style={{ 
+            fontSize: 'clamp(0.9rem, 4vw, 1.2rem)', 
+            color: '#ddd', 
+            maxWidth: '600px', 
+            margin: '0 auto',
+            padding: '0 15px'
+          }}>Our global team is ready to assist you with premium automotive protection solutions across the Middle East, Asia, and beyond.</p>
         </div>
       </section>
 
-      <div className="container" style={{ maxWidth: '1300px', margin: '0 auto', padding: '0 30px' }}>
-        <div className="contact-main fade-section" style={{ margin: '80px 0' }}>
+      <div className="container" style={{ maxWidth: '1300px', margin: '0 auto', padding: '0 20px' }}>
+        <div className="contact-main fade-section" style={{ margin: '60px 0' }}>
           <div className="contact-grid" style={{
             display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: '50px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))',
+            gap: '30px',
             background: '#0A0A0F',
-            borderRadius: '48px',
-            padding: '48px',
+            borderRadius: '32px',
+            padding: 'clamp(24px, 5vw, 48px)',
             border: '1px solid rgba(229,9,20,0.2)'
           }}>
             {/* Contact Form */}
             <div className="contact-form">
-              <h2 style={{ fontSize: '1.8rem', marginBottom: '20px', color: '#E50914' }}><i className="fas fa-paper-plane"></i> Send us a message</h2>
+              <h2 style={{ 
+                fontSize: 'clamp(1.4rem, 5vw, 1.8rem)', 
+                marginBottom: '20px', 
+                color: '#E50914' 
+              }}>
+                <i className="fas fa-paper-plane"></i> Send us a message
+              </h2>
               <form onSubmit={handleSubmit}>
                 <div className="form-group" style={{ marginBottom: '20px' }}>
-                  <label htmlFor="name" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc' }}>Full Name *</label>
+                  <label htmlFor="name" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc', fontSize: '0.95rem' }}>Full Name *</label>
                   <input 
                     type="text" 
                     id="name" 
@@ -193,11 +213,24 @@ export const ContactPage: React.FC = () => {
                     value={formData.name} 
                     onChange={handleChange} 
                     placeholder="John Doe" 
-                    style={{ width: '100%', padding: '14px 18px', background: '#13131A', border: '1px solid #2A2A35', borderRadius: '20px', color: 'white', fontFamily: 'inherit', fontSize: '1rem', outline: 'none', transition: 'all 0.3s ease', boxSizing: 'border-box' }} 
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 16px', 
+                      background: '#13131A', 
+                      border: '1px solid #2A2A35', 
+                      borderRadius: '16px', 
+                      color: 'white', 
+                      fontFamily: 'inherit', 
+                      fontSize: 'clamp(0.9rem, 4vw, 1rem)', 
+                      outline: 'none', 
+                      transition: 'all 0.3s ease', 
+                      boxSizing: 'border-box',
+                      WebkitAppearance: 'none'
+                    }} 
                   />
                 </div>
                 <div className="form-group" style={{ marginBottom: '20px' }}>
-                  <label htmlFor="email" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc' }}>Email Address *</label>
+                  <label htmlFor="email" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc', fontSize: '0.95rem' }}>Email Address *</label>
                   <input 
                     type="email" 
                     id="email" 
@@ -206,11 +239,24 @@ export const ContactPage: React.FC = () => {
                     value={formData.email} 
                     onChange={handleChange} 
                     placeholder="john@example.com" 
-                    style={{ width: '100%', padding: '14px 18px', background: '#13131A', border: '1px solid #2A2A35', borderRadius: '20px', color: 'white', fontFamily: 'inherit', fontSize: '1rem', outline: 'none', transition: 'all 0.3s ease', boxSizing: 'border-box' }} 
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 16px', 
+                      background: '#13131A', 
+                      border: '1px solid #2A2A35', 
+                      borderRadius: '16px', 
+                      color: 'white', 
+                      fontFamily: 'inherit', 
+                      fontSize: 'clamp(0.9rem, 4vw, 1rem)', 
+                      outline: 'none', 
+                      transition: 'all 0.3s ease', 
+                      boxSizing: 'border-box',
+                      WebkitAppearance: 'none'
+                    }} 
                   />
                 </div>
                 <div className="form-group" style={{ marginBottom: '20px' }}>
-                  <label htmlFor="phone" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc' }}>Phone Number *</label>
+                  <label htmlFor="phone" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc', fontSize: '0.95rem' }}>Phone Number *</label>
                   <input 
                     type="tel" 
                     id="phone" 
@@ -219,18 +265,44 @@ export const ContactPage: React.FC = () => {
                     value={formData.phone} 
                     onChange={handleChange} 
                     placeholder="+XXX XX XXX XXXX" 
-                    style={{ width: '100%', padding: '14px 18px', background: '#13131A', border: '1px solid #2A2A35', borderRadius: '20px', color: 'white', fontFamily: 'inherit', fontSize: '1rem', outline: 'none', transition: 'all 0.3s ease', boxSizing: 'border-box' }} 
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 16px', 
+                      background: '#13131A', 
+                      border: '1px solid #2A2A35', 
+                      borderRadius: '16px', 
+                      color: 'white', 
+                      fontFamily: 'inherit', 
+                      fontSize: 'clamp(0.9rem, 4vw, 1rem)', 
+                      outline: 'none', 
+                      transition: 'all 0.3s ease', 
+                      boxSizing: 'border-box',
+                      WebkitAppearance: 'none'
+                    }} 
                   />
                 </div>
                 <div className="form-group" style={{ marginBottom: '20px' }}>
-                  <label htmlFor="region" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc' }}>Region *</label>
+                  <label htmlFor="region" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc', fontSize: '0.95rem' }}>Region *</label>
                   <select 
                     id="region" 
                     name="region" 
                     required 
                     value={formData.region} 
                     onChange={handleChange} 
-                    style={{ width: '100%', padding: '14px 18px', background: '#13131A', border: '1px solid #2A2A35', borderRadius: '20px', color: 'white', fontFamily: 'inherit', fontSize: '1rem', outline: 'none', transition: 'all 0.3s ease', boxSizing: 'border-box' }}>
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 16px', 
+                      background: '#13131A', 
+                      border: '1px solid #2A2A35', 
+                      borderRadius: '16px', 
+                      color: 'white', 
+                      fontFamily: 'inherit', 
+                      fontSize: 'clamp(0.9rem, 4vw, 1rem)', 
+                      outline: 'none', 
+                      transition: 'all 0.3s ease', 
+                      boxSizing: 'border-box',
+                      cursor: 'pointer'
+                    }}>
                     <option value="">Select your region</option>
                     <option value="Saudi Arabia">Saudi Arabia</option>
                     <option value="UAE">United Arab Emirates</option>
@@ -242,14 +314,27 @@ export const ContactPage: React.FC = () => {
                   </select>
                 </div>
                 <div className="form-group" style={{ marginBottom: '20px' }}>
-                  <label htmlFor="interest" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc' }}>Product Interest *</label>
+                  <label htmlFor="interest" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc', fontSize: '0.95rem' }}>Product Interest *</label>
                   <select 
                     id="interest" 
                     name="interest" 
                     required 
                     value={formData.interest} 
                     onChange={handleChange} 
-                    style={{ width: '100%', padding: '14px 18px', background: '#13131A', border: '1px solid #2A2A35', borderRadius: '20px', color: 'white', fontFamily: 'inherit', fontSize: '1rem', outline: 'none', transition: 'all 0.3s ease', boxSizing: 'border-box' }}>
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 16px', 
+                      background: '#13131A', 
+                      border: '1px solid #2A2A35', 
+                      borderRadius: '16px', 
+                      color: 'white', 
+                      fontFamily: 'inherit', 
+                      fontSize: 'clamp(0.9rem, 4vw, 1rem)', 
+                      outline: 'none', 
+                      transition: 'all 0.3s ease', 
+                      boxSizing: 'border-box',
+                      cursor: 'pointer'
+                    }}>
                     <option value="">Select product</option>
                     <option value="ULTRA PPF">ULTRA PPF</option>
                     <option value="TITAN PPF">TITAN PPF</option>
@@ -260,7 +345,7 @@ export const ContactPage: React.FC = () => {
                   </select>
                 </div>
                 <div className="form-group" style={{ marginBottom: '20px' }}>
-                  <label htmlFor="message" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc' }}>Message *</label>
+                  <label htmlFor="message" style={{ display: 'block', marginBottom: '8px', fontWeight: 500, color: '#ccc', fontSize: '0.95rem' }}>Message *</label>
                   <textarea 
                     id="message" 
                     name="message" 
@@ -269,37 +354,70 @@ export const ContactPage: React.FC = () => {
                     onChange={handleChange} 
                     placeholder="Tell us about your vehicle and protection needs..." 
                     rows={5} 
-                    style={{ width: '100%', padding: '14px 18px', background: '#13131A', border: '1px solid #2A2A35', borderRadius: '20px', color: 'white', fontFamily: 'inherit', fontSize: '1rem', outline: 'none', transition: 'all 0.3s ease', resize: 'vertical', minHeight: '120px', boxSizing: 'border-box' }} 
+                    style={{ 
+                      width: '100%', 
+                      padding: '12px 16px', 
+                      background: '#13131A', 
+                      border: '1px solid #2A2A35', 
+                      borderRadius: '16px', 
+                      color: 'white', 
+                      fontFamily: 'inherit', 
+                      fontSize: 'clamp(0.9rem, 4vw, 1rem)', 
+                      outline: 'none', 
+                      transition: 'all 0.3s ease', 
+                      resize: 'vertical', 
+                      minHeight: '120px', 
+                      boxSizing: 'border-box'
+                    }} 
                   />
                 </div>
 
                 {/* Math CAPTCHA */}
                 <div style={{
                   background: '#0F0F15',
-                  padding: '20px',
-                  borderRadius: '20px',
+                  padding: 'clamp(15px, 4vw, 20px)',
+                  borderRadius: '16px',
                   margin: '20px 0',
                   border: '1px solid #2A2A35',
                   textAlign: 'center'
                 }}>
                   <div style={{
-                    fontSize: '1.3rem',
+                    fontSize: 'clamp(1rem, 4vw, 1.3rem)',
                     color: '#E50914',
                     marginBottom: '15px',
-                    fontFamily: "'Orbitron', monospace"
+                    fontFamily: "'Orbitron', monospace",
+                    wordBreak: 'break-word'
                   }}>
-                    <span style={{ color: 'white', fontSize: '1.5rem', margin: '0 5px' }}>🔐</span>
+                    <span style={{ color: 'white', fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', margin: '0 5px' }}>🔐</span>
                     {captchaQuestion} = ?
-                    <span style={{ color: 'white', fontSize: '1.5rem', margin: '0 5px' }}>❓</span>
+                    <span style={{ color: 'white', fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', margin: '0 5px' }}>❓</span>
                   </div>
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
+                  <div className="captcha-input-group" style={{ 
+                    display: 'flex', 
+                    gap: '10px', 
+                    justifyContent: 'center', 
+                    alignItems: 'center', 
+                    flexWrap: 'wrap',
+                    flexDirection: 'column'
+                  }}>
                     <input 
                       type="number" 
                       value={captchaAnswer} 
                       onChange={(e) => validateCaptcha(e.target.value)}
                       placeholder="Enter your answer" 
                       autoComplete="off"
-                      style={{ width: '120px', textAlign: 'center', fontSize: '1.1rem', padding: '10px', background: '#13131A', border: '1px solid #2A2A35', borderRadius: '20px', color: 'white', outline: 'none', boxSizing: 'border-box' }}
+                      style={{ 
+                        width: 'clamp(100px, 70%, 120px)', 
+                        textAlign: 'center', 
+                        fontSize: 'clamp(1rem, 4vw, 1.1rem)', 
+                        padding: '10px', 
+                        background: '#13131A', 
+                        border: '1px solid #2A2A35', 
+                        borderRadius: '16px', 
+                        color: 'white', 
+                        outline: 'none', 
+                        boxSizing: 'border-box'
+                      }}
                     />
                     <button 
                       type="button" 
@@ -313,13 +431,14 @@ export const ContactPage: React.FC = () => {
                         cursor: 'pointer',
                         transition: '0.2s',
                         fontFamily: "'Orbitron', monospace",
-                        fontSize: '0.8rem'
+                        fontSize: 'clamp(0.75rem, 3.5vw, 0.8rem)',
+                        whiteSpace: 'nowrap'
                       }}>
                       <i className="fas fa-sync-alt"></i> New
                     </button>
                   </div>
                   <div style={{
-                    fontSize: '0.75rem',
+                    fontSize: 'clamp(0.7rem, 3vw, 0.75rem)',
                     marginTop: '10px',
                     color: captchaValid ? '#4caf50' : '#888'
                   }}>
@@ -336,7 +455,8 @@ export const ContactPage: React.FC = () => {
                     background: message.type === 'success' ? 'rgba(46, 204, 113, 0.2)' : message.type === 'error' ? 'rgba(231, 76, 60, 0.2)' : 'rgba(52, 152, 219, 0.2)',
                     border: `1px solid ${message.type === 'success' ? '#2ecc71' : message.type === 'error' ? '#e74c3c' : '#3498db'}`,
                     color: message.type === 'success' ? '#2ecc71' : message.type === 'error' ? '#e74c3c' : '#3498db',
-                    display: message ? 'block' : 'none'
+                    display: message ? 'block' : 'none',
+                    fontSize: 'clamp(0.85rem, 3.5vw, 0.95rem)'
                   }}>
                     {message.text}
                   </div>
@@ -350,10 +470,10 @@ export const ContactPage: React.FC = () => {
                     background: '#E50914',
                     color: 'white',
                     border: 'none',
-                    padding: '16px',
+                    padding: 'clamp(14px, 4vw, 16px)',
                     borderRadius: '40px',
                     fontWeight: 'bold',
-                    fontSize: '1rem',
+                    fontSize: 'clamp(0.9rem, 4vw, 1rem)',
                     fontFamily: "'Orbitron', monospace",
                     cursor: loading ? 'not-allowed' : 'pointer',
                     marginTop: '10px',
@@ -368,7 +488,7 @@ export const ContactPage: React.FC = () => {
             {/* Support Agent Card */}
             <div style={{
               background: 'linear-gradient(145deg, #0F0F15, #0A0A0F)',
-              borderRadius: '32px',
+              borderRadius: 'clamp(24px, 5vw, 32px)',
               overflow: 'hidden',
               transition: 'transform 0.3s ease, box-shadow 0.3s ease',
               border: '1px solid rgba(229,9,20,0.3)',
@@ -382,23 +502,54 @@ export const ContactPage: React.FC = () => {
                 onError={(e) => {
                   (e.target as HTMLImageElement).src = 'https://placehold.co/400x380/1A1A22/E50914?text=Zeo+Shields+Agent';
                 }}
-                style={{ width: '100%', height: '380px', objectFit: 'cover', objectPosition: 'center 20%', display: 'block', filter: 'grayscale(15%)', transition: 'filter 0.3s ease' }}
+                style={{ 
+                  width: '100%', 
+                  height: 'clamp(250px, 40vw, 380px)', 
+                  objectFit: 'cover', 
+                  objectPosition: 'center 20%', 
+                  display: 'block', 
+                  filter: 'grayscale(15%)', 
+                  transition: 'filter 0.3s ease' 
+                }}
               />
               <div style={{
-                padding: '28px 25px',
+                padding: 'clamp(20px, 5vw, 28px) clamp(20px, 5vw, 25px)',
                 textAlign: 'center',
                 background: 'rgba(10, 10, 15, 0.95)',
                 borderTop: '1px solid rgba(229,9,20,0.4)'
               }}>
-                <h3 style={{ color: '#E50914', fontSize: '1.5rem', marginBottom: '8px', fontFamily: "'Orbitron', monospace" }}>
+                <h3 style={{ 
+                  color: '#E50914', 
+                  fontSize: 'clamp(1.2rem, 4.5vw, 1.5rem)', 
+                  marginBottom: '8px', 
+                  fontFamily: "'Orbitron', monospace" 
+                }}>
                   <i className="fas fa-headset"></i> Get Professional Support
                 </h3>
-                <p style={{ fontSize: '0.95rem', color: '#bbb', lineHeight: 1.5 }}>Global Support Specialist</p>
-                <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '15px', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '0.85rem', color: '#E50914' }}><i className="fas fa-envelope"></i> info@zeoshields.com</span>
-                  <span style={{ fontSize: '0.85rem', color: '#E50914' }}><i className="fas fa-comment-dots"></i> 24/7 Support</span>
+                <p style={{ fontSize: 'clamp(0.85rem, 3.5vw, 0.95rem)', color: '#bbb', lineHeight: 1.5 }}>Global Support Specialist</p>
+                <div className="support-contact-group" style={{ 
+                  display: 'flex', 
+                  justifyContent: 'center', 
+                  gap: 'clamp(10px, 4vw, 20px)', 
+                  marginTop: '15px', 
+                  flexWrap: 'wrap',
+                  flexDirection: 'column'
+                }}>
+                  <span style={{ fontSize: 'clamp(0.75rem, 3vw, 0.85rem)', color: '#E50914', wordBreak: 'break-all' }}>
+                    <i className="fas fa-envelope"></i> info@zeoshields.com
+                  </span>
+                  <span style={{ fontSize: 'clamp(0.75rem, 3vw, 0.85rem)', color: '#E50914' }}>
+                    <i className="fas fa-comment-dots"></i> 24/7 Support
+                  </span>
                 </div>
-                <p style={{ marginTop: '15px', fontSize: '0.9rem', color: '#bbb', lineHeight: 1.5 }}>"Our dedicated team is here to provide expert guidance on PPF, Window Tint, and Windshield Protection. Reach out anytime!"</p>
+                <p style={{ 
+                  marginTop: '15px', 
+                  fontSize: 'clamp(0.85rem, 3.5vw, 0.9rem)', 
+                  color: '#bbb', 
+                  lineHeight: 1.5 
+                }}>
+                  Our dedicated team is here to provide expert guidance on PPF, Window Tint, and Windshield Protection. Reach out anytime!
+                </p>
               </div>
             </div>
           </div>
@@ -418,26 +569,36 @@ export const ContactPage: React.FC = () => {
           zIndex: 4000,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          padding: '20px'
         }} onClick={() => setShowSuccessModal(false)}>
           <div style={{
             background: '#0F0F15',
-            borderRadius: '36px',
+            borderRadius: 'clamp(28px, 6vw, 36px)',
             maxWidth: '450px',
             width: '90%',
-            padding: '40px 35px',
+            padding: 'clamp(30px, 8vw, 40px) clamp(20px, 5vw, 35px)',
             textAlign: 'center',
             border: '1px solid rgba(76, 175, 80, 0.5)',
             transform: 'scale(0.96)',
             transition: 'transform 0.2s ease',
             animation: 'modalPopIn 0.3s ease'
           }} onClick={(e) => e.stopPropagation()}>
-            <div style={{ fontSize: '5rem', color: '#4caf50', marginBottom: '20px' }}>
+            <div style={{ fontSize: 'clamp(3.5rem, 10vw, 5rem)', color: '#4caf50', marginBottom: '20px' }}>
               <i className="fas fa-check-circle"></i>
             </div>
-            <h3 style={{ fontFamily: "'Orbitron', monospace", color: '#4caf50', fontSize: '1.8rem', marginBottom: '15px' }}>Message Sent Successfully!</h3>
-            <p style={{ color: '#ddd', margin: '10px 0', lineHeight: 1.5 }}>Thank you for contacting Zeo Shields.</p>
-            <p style={{ color: '#ddd', margin: '10px 0', lineHeight: 1.5 }}>Our team will respond to your inquiry shortly.</p>
+            <h3 style={{ 
+              fontFamily: "'Orbitron', monospace", 
+              color: '#4caf50', 
+              fontSize: 'clamp(1.3rem, 5vw, 1.8rem)', 
+              marginBottom: '15px' 
+            }}>Message Sent Successfully!</h3>
+            <p style={{ color: '#ddd', margin: '10px 0', lineHeight: 1.5, fontSize: 'clamp(0.9rem, 3.5vw, 1rem)' }}>
+              Thank you for contacting Zeo Shields.
+            </p>
+            <p style={{ color: '#ddd', margin: '10px 0', lineHeight: 1.5, fontSize: 'clamp(0.9rem, 3.5vw, 1rem)' }}>
+              Our team will respond to your inquiry shortly.
+            </p>
             <button 
               onClick={() => {
                 setShowSuccessModal(false);
@@ -447,13 +608,15 @@ export const ContactPage: React.FC = () => {
                 background: '#4caf50',
                 color: 'white',
                 border: 'none',
-                padding: '12px 28px',
+                padding: 'clamp(10px, 3vw, 12px) clamp(20px, 5vw, 28px)',
                 borderRadius: '40px',
                 fontWeight: 'bold',
                 cursor: 'pointer',
                 fontFamily: "'Orbitron', monospace",
                 marginTop: '20px',
-                transition: '0.2s'
+                transition: '0.2s',
+                fontSize: 'clamp(0.85rem, 3.5vw, 1rem)',
+                width: 'auto'
               }}>
               <i className="fas fa-check"></i> Continue
             </button>
@@ -462,14 +625,128 @@ export const ContactPage: React.FC = () => {
       )}
 
       <style>{`
-        .fade-section { opacity: 0; transform: translateY(30px); transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
-        .fade-section.visible { opacity: 1; transform: translateY(0); }
-        .spinner { display: inline-block; width: 20px; height: 20px; border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: white; animation: spin 0.8s linear infinite; margin-right: 8px; vertical-align: middle; }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes modalPopIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        input:focus, select:focus, textarea:focus { border-color: #E50914 !important; box-shadow: 0 0 0 2px rgba(229,9,20,0.2) !important; }
-        @media (max-width: 900px) { 
-          .contact-grid { grid-template-columns: 1fr; padding: 30px; }
+        /* Base responsive styles */
+        * {
+          -webkit-tap-highlight-color: transparent;
+        }
+        
+        .fade-section { 
+          opacity: 0; 
+          transform: translateY(30px); 
+          transition: opacity 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94), transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+        }
+        
+        .fade-section.visible { 
+          opacity: 1; 
+          transform: translateY(0); 
+        }
+        
+        .spinner { 
+          display: inline-block; 
+          width: 20px; 
+          height: 20px; 
+          border: 2px solid rgba(255,255,255,0.3); 
+          border-radius: 50%; 
+          border-top-color: white; 
+          animation: spin 0.8s linear infinite; 
+          margin-right: 8px; 
+          vertical-align: middle; 
+        }
+        
+        @keyframes spin { 
+          to { transform: rotate(360deg); } 
+        }
+        
+        @keyframes modalPopIn { 
+          from { transform: scale(0.9); opacity: 0; } 
+          to { transform: scale(1); opacity: 1; } 
+        }
+        
+        input:focus, select:focus, textarea:focus { 
+          border-color: #E50914 !important; 
+          box-shadow: 0 0 0 2px rgba(229,9,20,0.2) !important; 
+        }
+        
+        /* CAPTCHA and Support contact responsive styles */
+        @media (min-width: 480px) {
+          .captcha-input-group {
+            flex-direction: row !important;
+          }
+          
+          .support-contact-group {
+            flex-direction: row !important;
+          }
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+          .container {
+            padding: 0 15px !important;
+          }
+          
+          .contact-main {
+            margin: 40px 0 !important;
+          }
+          
+          input, select, textarea, button {
+            font-size: 16px !important; /* Prevents zoom on mobile */
+          }
+          
+          button {
+            min-height: 44px; /* Better touch target */
+          }
+          
+          .contact-form h2 {
+            text-align: center;
+          }
+        }
+        
+        /* Small mobile devices */
+        @media (max-width: 480px) {
+          .contact-grid {
+            padding: 20px !important;
+            gap: 20px !important;
+            border-radius: 24px !important;
+          }
+          
+          .contact-hero .container {
+            padding: 60px 15px !important;
+          }
+        }
+        
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+          button, 
+          select, 
+          input[type="submit"] {
+            cursor: pointer;
+          }
+          
+          button:active {
+            transform: scale(0.98);
+          }
+        }
+        
+        /* Landscape mode on mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+          .contact-hero {
+            min-height: 40vh;
+          }
+          
+          .contact-hero .container {
+            padding: 40px 20px !important;
+          }
+        }
+        
+        /* Ensure images are responsive */
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+        
+        /* Improve scrolling on iOS */
+        .contact-main {
+          -webkit-overflow-scrolling: touch;
         }
       `}</style>
     </>
