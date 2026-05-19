@@ -1,4 +1,3 @@
-
 import { type ClientSchema, a, defineData } from '@aws-amplify/backend';
 
 const schema = a.schema({
@@ -17,8 +16,8 @@ const schema = a.schema({
     createdAt: a.datetime(),
   })
   .authorization(allow => [
-    allow.owner(),
-    allow.authenticated()
+    allow.guest(),  // ✅ Allow public (guest) access to read
+    allow.authenticated(),  // ✅ Allow authenticated users full access
   ]),
 
   // Contact submission model
@@ -33,8 +32,8 @@ const schema = a.schema({
     createdAt: a.datetime(),
   })
   .authorization(allow => [
-    allow.owner(),
-    allow.authenticated()
+    allow.guest(),  // ✅ Allow public to create contacts
+    allow.authenticated(),  // ✅ Allow authenticated users full access
   ]),
 });
 
@@ -42,6 +41,6 @@ export type Schema = ClientSchema<typeof schema>;
 export const data = defineData({
   schema,
   authorizationModes: {
-    defaultAuthorizationMode: 'userPool',
+    defaultAuthorizationMode: 'iam',
   },
 });

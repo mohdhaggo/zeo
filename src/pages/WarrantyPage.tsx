@@ -2,7 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { generateClient } from 'aws-amplify/data';
 import type { Schema } from '../../amplify/data/resource';
 
-const client = generateClient<Schema>();
+// Configure client for public access
+const client = generateClient<Schema>({
+  authMode: 'apiKey', // Use API key instead of user pool for public access
+});
 
 interface WarrantyData {
   id: string;
@@ -46,15 +49,22 @@ export const WarrantyPage: React.FC = () => {
     return () => observer.disconnect();
   }, []);
 
-  // Check warranty using AWS Amplify
+  // Check warranty using AWS Amplify with public access
   const checkWarranty = async (warrantyNumber: string) => {
+    if (!warrantyNumber.trim()) {
+      setMessage({ text: '⚠️ Please enter a Warranty ID.', type: 'error' });
+      return;
+    }
+
     setLoading(true);
     setMessage(null);
     setWarrantyDetails(null);
 
     try {
-      // List all warranties and find by warrantyNumber
-      const { data, errors } = await client.models.Warranty.list();
+      // Use API key auth mode for public access
+      const { data, errors } = await client.models.Warranty.list({
+        authMode: 'apiKey'
+      });
       
       if (errors) {
         throw new Error(errors[0].message);
@@ -138,7 +148,10 @@ export const WarrantyPage: React.FC = () => {
       }
       
       setShowModal(false);
-      setSuccessData({ warrantyId: warrantyDetails.warrantyNumber, registeredTo: fullName });
+      setSuccessData({ 
+        warrantyId: warrantyDetails.warrantyNumber, 
+        registeredTo: fullName 
+      });
       setShowSuccessModal(true);
       handleReset();
       
@@ -192,228 +205,219 @@ export const WarrantyPage: React.FC = () => {
   };
 
   return (
-    <>
-      <div className="container" style={{ maxWidth: '1300px', margin: '0 auto', padding: '0 30px' }}>
-        {/* Warranty Hero */}
-        <div className="warranty-hero fade-section" style={{ padding: '60px 0 40px', textAlign: 'center' }}>
-          <div className="warranty-badge" style={{
-            display: 'inline-block',
-            background: 'rgba(229,9,20,0.2)',
-            padding: '6px 16px',
-            borderRadius: '30px',
-            fontSize: '0.8rem',
-            marginBottom: '20px',
-            borderLeft: '3px solid #E50914',
-            fontFamily: "'Orbitron', monospace"
-          }}>
-            <i className="fas fa-shield-alt"></i> OFFICIAL REGISTRATION PORTAL
-          </div>
-          <h1 style={{
-            fontSize: '3rem',
-            background: 'linear-gradient(135deg, #FFFFFF, #E50914)',
-            WebkitBackgroundClip: 'text',
-            backgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            marginBottom: '15px'
-          }}>Warranty Registration</h1>
-          <p style={{ color: '#aaa', maxWidth: '650px', margin: '0 auto' }}>Register your Zeo Shields product warranty. Enter your unique Warranty ID to get started.</p>
-        </div>
-
-        {/* Warranty Card */}
-        <div className="warranty-card fade-section" style={{
-          maxWidth: '650px',
-          margin: '20px auto 60px',
-          background: '#0C0C12',
-          borderRadius: '32px',
-          border: '1px solid rgba(229,9,20,0.3)',
-          padding: '40px 36px',
-          textAlign: 'center',
-          boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
-          transition: 'transform 0.3s ease'
+    <div className="container" style={{ maxWidth: '1300px', margin: '0 auto', padding: '0 30px' }}>
+      {/* Warranty Hero */}
+      <div className="warranty-hero fade-section" style={{ padding: '60px 0 40px', textAlign: 'center' }}>
+        <div className="warranty-badge" style={{
+          display: 'inline-block',
+          background: 'rgba(229,9,20,0.2)',
+          padding: '6px 16px',
+          borderRadius: '30px',
+          fontSize: '0.8rem',
+          marginBottom: '20px',
+          borderLeft: '3px solid #E50914',
+          fontFamily: "'Orbitron', monospace"
         }}>
-          <div style={{ fontSize: '4rem', color: '#E50914', marginBottom: '16px' }}>
-            <i className="fas fa-id-card"></i>
-          </div>
-          <h2 style={{ fontSize: '1.8rem', marginBottom: '12px', color: '#fff' }}>Check Your Warranty</h2>
-          <p style={{ color: '#aaa', marginBottom: '28px', fontSize: '0.95rem' }}>Please enter the Warranty ID provided with your product purchase.</p>
-          
-          <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
-            <input
-              type="text"
-              value={warrantyId}
-              onChange={(e) => setWarrantyId(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && checkWarranty(warrantyId)}
-              placeholder="Enter Warranty ID (e.g., PPF-00-12345)"
-              style={{
-                flex: '2',
-                minWidth: '200px',
-                padding: '14px 20px',
-                background: '#1A1A22',
-                border: '1px solid #333',
-                borderRadius: '60px',
-                color: 'white',
-                fontSize: '1rem',
-                outline: 'none',
-                transition: '0.2s'
-              }}
-              disabled={loading}
-            />
-            <button
-              onClick={() => checkWarranty(warrantyId)}
-              disabled={loading}
-              style={{
-                padding: '14px 32px',
-                background: '#E50914',
-                border: 'none',
-                borderRadius: '60px',
-                fontWeight: 'bold',
-                color: 'white',
-                cursor: loading ? 'not-allowed' : 'pointer',
-                fontFamily: "'Orbitron', monospace",
-                transition: '0.2s',
-                opacity: loading ? 0.6 : 1
-              }}
-            >
-              <i className="fas fa-arrow-right"></i> {loading ? 'Checking...' : 'Enter'}
-            </button>
-          </div>
-          
-          {message && (
-            <div style={{
-              background: message.type === 'error' ? '#1e1215' : message.type === 'success' ? '#121b12' : '#1f1b10',
-              borderRadius: '24px',
-              padding: '16px 20px',
-              margin: '20px 0',
-              textAlign: 'center',
-              borderLeft: `4px solid ${message.type === 'error' ? '#E50914' : message.type === 'success' ? '#4caf50' : '#ffc107'}`,
-              color: message.type === 'error' ? '#ff9b9b' : message.type === 'success' ? '#b9f6ca' : '#ffe0a3'
-            }}>
-              {message.text}
-            </div>
-          )}
+          <i className="fas fa-shield-alt"></i> OFFICIAL REGISTRATION PORTAL
+        </div>
+        <h1 style={{
+          fontSize: '3rem',
+          background: 'linear-gradient(135deg, #FFFFFF, #E50914)',
+          WebkitBackgroundClip: 'text',
+          backgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          marginBottom: '15px'
+        }}>Warranty Registration</h1>
+        <p style={{ color: '#aaa', maxWidth: '650px', margin: '0 auto' }}>Register your Zeo Shields product warranty. Enter your unique Warranty ID to get started.</p>
+      </div>
 
-          {/* Warranty Details */}
-          {warrantyDetails && (
-            <div style={{
+      {/* Warranty Card */}
+      <div className="warranty-card fade-section" style={{
+        maxWidth: '650px',
+        margin: '20px auto 60px',
+        background: '#0C0C12',
+        borderRadius: '32px',
+        border: '1px solid rgba(229,9,20,0.3)',
+        padding: '40px 36px',
+        textAlign: 'center',
+        boxShadow: '0 20px 40px rgba(0,0,0,0.4)',
+        transition: 'transform 0.3s ease'
+      }}>
+        <div style={{ fontSize: '4rem', color: '#E50914', marginBottom: '16px' }}>
+          <i className="fas fa-id-card"></i>
+        </div>
+        <h2 style={{ fontSize: '1.8rem', marginBottom: '12px', color: '#fff' }}>Check Your Warranty</h2>
+        <p style={{ color: '#aaa', marginBottom: '28px', fontSize: '0.95rem' }}>Please enter the Warranty ID provided with your product purchase.</p>
+        
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <input
+            type="text"
+            value={warrantyId}
+            onChange={(e) => setWarrantyId(e.target.value)}
+            onKeyPress={(e) => e.key === 'Enter' && checkWarranty(warrantyId)}
+            placeholder="Enter Warranty ID (e.g., PPF-00-12345)"
+            style={{
+              flex: '2',
+              minWidth: '200px',
+              padding: '14px 20px',
               background: '#1A1A22',
-              borderRadius: '24px',
-              padding: '20px',
-              margin: '20px 0',
-              textAlign: 'left',
-              border: '1px solid rgba(229,9,20,0.2)'
+              border: '1px solid #333',
+              borderRadius: '60px',
+              color: 'white',
+              fontSize: '1rem',
+              outline: 'none',
+              transition: '0.2s'
+            }}
+            disabled={loading}
+          />
+          <button
+            onClick={() => checkWarranty(warrantyId)}
+            disabled={loading}
+            style={{
+              padding: '14px 32px',
+              background: '#E50914',
+              border: 'none',
+              borderRadius: '60px',
+              fontWeight: 'bold',
+              color: 'white',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              fontFamily: "'Orbitron', monospace",
+              transition: '0.2s',
+              opacity: loading ? 0.6 : 1
+            }}
+          >
+            <i className="fas fa-arrow-right"></i> {loading ? 'Checking...' : 'Enter'}
+          </button>
+        </div>
+        
+        {message && (
+          <div style={{
+            background: message.type === 'error' ? '#1e1215' : message.type === 'success' ? '#121b12' : '#1f1b10',
+            borderRadius: '24px',
+            padding: '16px 20px',
+            margin: '20px 0',
+            textAlign: 'center',
+            borderLeft: `4px solid ${message.type === 'error' ? '#E50914' : message.type === 'success' ? '#4caf50' : '#ffc107'}`,
+            color: message.type === 'error' ? '#ff9b9b' : message.type === 'success' ? '#b9f6ca' : '#ffe0a3'
+          }}>
+            {message.text}
+          </div>
+        )}
+
+        {/* Warranty Details */}
+        {warrantyDetails && (
+          <div style={{
+            background: '#1A1A22',
+            borderRadius: '24px',
+            padding: '20px',
+            margin: '20px 0',
+            textAlign: 'left',
+            border: '1px solid rgba(229,9,20,0.2)'
+          }}>
+            <h3 style={{
+              color: '#E50914',
+              fontFamily: "'Orbitron', monospace",
+              fontSize: '1.2rem',
+              marginBottom: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              borderBottom: '1px solid #333',
+              paddingBottom: '12px'
             }}>
-              <h3 style={{
-                color: '#E50914',
-                fontFamily: "'Orbitron', monospace",
-                fontSize: '1.2rem',
-                marginBottom: '16px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                borderBottom: '1px solid #333',
-                paddingBottom: '12px'
-              }}>
-                <i className="fas fa-info-circle"></i> Warranty Information
-              </h3>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
-                <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Warranty ID:</span>
-                <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.warrantyNumber}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
-                <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Product Type:</span>
-                <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.productName}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
-                <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Manufacture Date:</span>
-                <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.manufactureDate)}</span>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
-                <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Status:</span>
-                <span style={{
-                  display: 'inline-block',
-                  padding: '4px 12px',
-                  borderRadius: '20px',
-                  fontSize: '0.75rem',
-                  fontWeight: 'bold',
-                  background: warrantyDetails.status === 'ACTIVE' ? '#4caf50' : '#ffc107',
-                  color: warrantyDetails.status === 'ACTIVE' ? 'white' : '#000'
-                }}>
-                  {warrantyDetails.status === 'ACTIVE' ? '✓ Registered' : '⏱ Not Registered'}
-                </span>
-              </div>
-              
-              {warrantyDetails.status === 'ACTIVE' && (
-                <>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '1px solid #2a2a2a', marginTop: '10px', paddingTop: '15px' }}>
-                    <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Registration Date:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.registrationDate)}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
-                    <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Registered To:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.customerName}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
-                    <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Mobile Number:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.phone}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
-                    <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Email ID:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.email}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
-                    <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Purchase Date:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.purchaseDate)}</span>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
-                    <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Purchase Country:</span>
-                    <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.purchaseCountry}</span>
-                  </div>
-                </>
-              )}
+              <i className="fas fa-info-circle"></i> Warranty Information
+            </h3>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
+              <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Warranty ID:</span>
+              <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.warrantyNumber}</span>
             </div>
-          )}
-          
-          {/* Action Buttons */}
-          {warrantyDetails && (
-            <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '20px' }}>
-              {warrantyDetails.status !== 'ACTIVE' && (
-                <button onClick={openRegistrationModal} style={{
-                  padding: '12px 28px',
-                  borderRadius: '40px',
-                  fontWeight: 'bold',
-                  cursor: 'pointer',
-                  background: '#E50914',
-                  color: 'white',
-                  border: 'none',
-                  fontFamily: "'Orbitron', monospace",
-                  transition: '0.2s'
-                }}>
-                  <i className="fas fa-pen-alt"></i> Register Now
-                </button>
-              )}
-              <button onClick={handleReset} style={{
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
+              <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Product Type:</span>
+              <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.productName}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
+              <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Manufacture Date:</span>
+              <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.manufactureDate)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
+              <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Status:</span>
+              <span style={{
+                display: 'inline-block',
+                padding: '4px 12px',
+                borderRadius: '20px',
+                fontSize: '0.75rem',
+                fontWeight: 'bold',
+                background: warrantyDetails.status === 'ACTIVE' ? '#4caf50' : '#ffc107',
+                color: warrantyDetails.status === 'ACTIVE' ? 'white' : '#000'
+              }}>
+                {warrantyDetails.status === 'ACTIVE' ? '✓ Registered' : '⏱ Not Registered'}
+              </span>
+            </div>
+            
+            {warrantyDetails.status === 'ACTIVE' && (
+              <>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderTop: '1px solid #2a2a2a', marginTop: '10px', paddingTop: '15px' }}>
+                  <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Registration Date:</span>
+                  <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.registrationDate)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
+                  <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Registered To:</span>
+                  <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.customerName}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
+                  <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Mobile Number:</span>
+                  <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.phone}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
+                  <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Email ID:</span>
+                  <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.email}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0', borderBottom: '1px solid #2a2a2a' }}>
+                  <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Purchase Date:</span>
+                  <span style={{ color: '#fff', fontSize: '0.85rem' }}>{formatDateOnly(warrantyDetails.purchaseDate)}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', padding: '10px 0' }}>
+                  <span style={{ fontWeight: 600, color: '#aaa', fontSize: '0.85rem' }}>Purchase Country:</span>
+                  <span style={{ color: '#fff', fontSize: '0.85rem' }}>{warrantyDetails.purchaseCountry}</span>
+                </div>
+              </>
+            )}
+          </div>
+        )}
+        
+        {/* Action Buttons */}
+        {warrantyDetails && (
+          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', marginTop: '20px' }}>
+            {warrantyDetails.status !== 'ACTIVE' && (
+              <button onClick={openRegistrationModal} style={{
                 padding: '12px 28px',
                 borderRadius: '40px',
                 fontWeight: 'bold',
                 cursor: 'pointer',
-                background: '#2C2C36',
-                color: '#ddd',
+                background: '#E50914',
+                color: 'white',
                 border: 'none',
                 fontFamily: "'Orbitron', monospace",
                 transition: '0.2s'
               }}>
-                <i className="fas fa-times"></i> Clear
+                <i className="fas fa-pen-alt"></i> Register Now
               </button>
-            </div>
-          )}
-        </div>
-
-        {/* Info Section */}
-        <div className="fade-section" style={{ textAlign: 'center', margin: '20px 0 60px' }}>
-          <p style={{ color: '#888', fontSize: '0.85rem' }}>
-            <i className="fas fa-lock"></i> Secure validation • warranty coverage • Worldwide support
-          </p>
-        </div>
+            )}
+            <button onClick={handleReset} style={{
+              padding: '12px 28px',
+              borderRadius: '40px',
+              fontWeight: 'bold',
+              cursor: 'pointer',
+              background: '#2C2C36',
+              color: '#ddd',
+              border: 'none',
+              fontFamily: "'Orbitron', monospace",
+              transition: '0.2s'
+            }}>
+              <i className="fas fa-times"></i> Clear
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Registration Modal */}
@@ -605,15 +609,15 @@ export const WarrantyPage: React.FC = () => {
             <p style={{ color: '#ddd', margin: '10px 0', lineHeight: '1.5' }}>Your warranty has been successfully registered.</p>
             <div style={{
               background: '#1A1A22',
-              padding: '10px',
+              padding: '15px',
               borderRadius: '40px',
               fontFamily: 'monospace',
               color: '#E50914',
               margin: '15px 0',
-              fontSize: '1.1rem'
+              fontSize: '1rem'
             }}>
-              Warranty ID: {successData.warrantyId}<br />
-              Registered To: {successData.registeredTo}
+              <strong>Warranty ID:</strong> {successData.warrantyId}<br />
+              <strong>Registered To:</strong> {successData.registeredTo}
             </div>
             <button 
               onClick={() => setShowSuccessModal(false)}
@@ -628,32 +632,15 @@ export const WarrantyPage: React.FC = () => {
                 fontFamily: "'Orbitron', monospace",
                 marginTop: '20px',
                 transition: '0.2s'
-              }}>
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#45a049'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#4caf50'}
+            >
               <i className="fas fa-check"></i> Continue
             </button>
           </div>
         </div>
       )}
-
-      <style>{`
-        .fade-section { opacity: 0; transform: translateY(20px); transition: opacity 0.6s, transform 0.6s; }
-        .fade-section.visible { opacity: 1; transform: translateY(0); }
-        .warranty-card:hover { transform: translateY(-5px); border-color: rgba(229,9,20,0.6); }
-        input:focus, select:focus { outline: none; border-color: #E50914 !important; }
-        @keyframes modalPopIn {
-          from {
-            transform: scale(0.9);
-            opacity: 0;
-          }
-          to {
-            transform: scale(1);
-            opacity: 1;
-          }
-        }
-        @media (max-width: 768px) {
-          .warranty-card { padding: 28px 20px; margin: 20px 20px 50px; }
-        }
-      `}</style>
-    </>
+    </div>
   );
 };
