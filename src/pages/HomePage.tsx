@@ -109,6 +109,18 @@ export const HomePage: React.FC = () => {
 
   return (
     <>
+        <div className="video-section fade-section">
+          <div className="video-wrapper">
+            <video autoPlay loop muted playsInline>
+              <source src="/white_car_PPF.mp4" type="video/mp4" />
+            </video>
+          </div>
+          <div className="video-info-panel">
+            <p><i className="fas fa-info-circle"></i> <strong>Watch our premium Paint Protection Film in action — engineered for global conditions.</strong></p>
+          </div>
+        </div>
+
+
       <section className="hero">
         <div className="hero-bg"></div>
         <div className="container">
@@ -169,16 +181,7 @@ export const HomePage: React.FC = () => {
           ))}
         </div>
 
-        <div className="video-section fade-section">
-          <div className="video-wrapper">
-            <video autoPlay loop muted playsInline>
-              <source src="/white_car_PPF.mp4" type="video/mp4" />
-            </video>
-          </div>
-          <div className="video-info-panel">
-            <p><i className="fas fa-info-circle"></i> <strong>Watch our premium Paint Protection Film in action — engineered for global conditions.</strong></p>
-          </div>
-        </div>
+
 
         <h2 className="section-title fade-section">Why Choose Zeo Shields</h2>
         <div className="feature-grid fade-section">

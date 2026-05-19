@@ -41,6 +41,7 @@ export const AdminDashboard: React.FC = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [editingRecord, setEditingRecord] = useState<WarrantyRecord | null>(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [formData, setFormData] = useState({
     warrantyNumber: '',
     productName: '',
@@ -60,6 +61,19 @@ export const AdminDashboard: React.FC = () => {
       return;
     }
     fetchData();
+
+    // Check screen size for initial sidebar state
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        setSidebarCollapsed(true);
+      } else {
+        setSidebarCollapsed(false);
+      }
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const fetchData = async () => {
@@ -230,6 +244,10 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
+  const toggleSidebar = () => {
+    setSidebarCollapsed(!sidebarCollapsed);
+  };
+
   const filteredWarranty = warrantyRecords.filter(r =>
     r.warrantyNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
     (r.customerName && r.customerName.toLowerCase().includes(searchTerm.toLowerCase())) ||
@@ -240,25 +258,45 @@ export const AdminDashboard: React.FC = () => {
     <div style={{ display: 'flex', minHeight: '100vh' }}>
       {/* Sidebar */}
       <div style={{
-        width: '280px',
+        width: sidebarCollapsed ? '80px' : '280px',
         background: '#050508',
         borderRight: '1px solid rgba(229,9,20,0.3)',
         position: 'fixed',
         height: '100vh',
-        overflowY: 'auto'
+        overflowY: 'auto',
+        transition: 'width 0.3s ease',
+        zIndex: 100
       }}>
-        <div style={{ padding: '28px 24px', borderBottom: '1px solid #1a1a22' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+        <div style={{ padding: '28px 24px', borderBottom: '1px solid #1a1a22', display: 'flex', alignItems: 'center', justifyContent: sidebarCollapsed ? 'center' : 'space-between' }}>
+          {!sidebarCollapsed && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <img src="/zeo_logo.webp" alt="Zeo" style={{ height: '42px' }} />
+              <span style={{
+                fontFamily: "'Orbitron', monospace",
+                fontSize: '1.3rem',
+                background: 'linear-gradient(130deg, #fff, #E50914)',
+                WebkitBackgroundClip: 'text',
+                backgroundClip: 'text',
+                color: 'transparent'
+              }}>ZEO ADMIN</span>
+            </div>
+          )}
+          {sidebarCollapsed && (
             <img src="/zeo_logo.webp" alt="Zeo" style={{ height: '42px' }} />
-            <span style={{
-              fontFamily: "'Orbitron', monospace",
-              fontSize: '1.3rem',
-              background: 'linear-gradient(130deg, #fff, #E50914)',
-              WebkitBackgroundClip: 'text',
-              backgroundClip: 'text',
-              color: 'transparent'
-            }}>ZEO ADMIN</span>
-          </div>
+          )}
+          <button
+            onClick={toggleSidebar}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#E50914',
+              cursor: 'pointer',
+              fontSize: '1.2rem',
+              padding: '4px 8px'
+            }}
+          >
+            <i className={`fas fa-chevron-${sidebarCollapsed ? 'right' : 'left'}`}></i>
+          </button>
         </div>
         
         <ul style={{ listStyle: 'none', padding: '0 16px' }}>
@@ -277,9 +315,11 @@ export const AdminDashboard: React.FC = () => {
               gap: '14px',
               padding: '14px 18px',
               color: activeTab === 'warranty' ? '#E50914' : '#bbb',
-              textDecoration: 'none'
+              textDecoration: 'none',
+              justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
             }}>
-              <i className="fas fa-shield-alt"></i> Warranty
+              <i className="fas fa-shield-alt"></i>
+              {!sidebarCollapsed && <span>Warranty</span>}
             </div>
           </li>
           <li 
@@ -297,21 +337,30 @@ export const AdminDashboard: React.FC = () => {
               gap: '14px',
               padding: '14px 18px',
               color: activeTab === 'contact' ? '#E50914' : '#bbb',
-              textDecoration: 'none'
+              textDecoration: 'none',
+              justifyContent: sidebarCollapsed ? 'center' : 'flex-start'
             }}>
-              <i className="fas fa-envelope"></i> Contact Requests
+              <i className="fas fa-envelope"></i>
+              {!sidebarCollapsed && <span>Contact Requests</span>}
             </div>
           </li>
         </ul>
       </div>
       
       {/* Main Content */}
-      <div style={{ flex: 1, marginLeft: '280px', padding: '24px 32px' }}>
+      <div style={{ 
+        flex: 1, 
+        marginLeft: sidebarCollapsed ? '80px' : '280px', 
+        padding: '24px 32px',
+        transition: 'margin-left 0.3s ease',
+        overflowX: 'auto',
+        width: 'calc(100% - ' + (sidebarCollapsed ? '80px' : '280px') + ')'
+      }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '16px' }}>
           <h1 style={{ fontFamily: "'Orbitron', monospace", fontSize: '1.8rem' }}>
             {activeTab === 'warranty' ? 'Warranty Management' : 'Contact Requests'}
           </h1>
-          <div style={{ display: 'flex', gap: '14px' }}>
+          <div style={{ display: 'flex', gap: '14px', flexWrap: 'wrap' }}>
             {activeTab === 'warranty' && (
               <>
                 <button
@@ -394,7 +443,8 @@ export const AdminDashboard: React.FC = () => {
               background: '#0C0C12',
               borderRadius: '24px',
               border: '1px solid rgba(229,9,20,0.2)',
-              overflowX: 'auto'
+              overflowX: 'auto',
+              WebkitOverflowScrolling: 'touch'
             }}>
               {loading ? (
                 <div style={{ textAlign: 'center', padding: '50px', color: '#666' }}>Loading...</div>
@@ -464,7 +514,8 @@ export const AdminDashboard: React.FC = () => {
             background: '#0C0C12',
             borderRadius: '24px',
             border: '1px solid rgba(229,9,20,0.2)',
-            overflowX: 'auto'
+            overflowX: 'auto',
+            WebkitOverflowScrolling: 'touch'
           }}>
             {loading ? (
               <div style={{ textAlign: 'center', padding: '50px', color: '#666' }}>Loading...</div>
@@ -543,7 +594,8 @@ export const AdminDashboard: React.FC = () => {
           zIndex: 1000,
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center'
+          justifyContent: 'center',
+          overflowY: 'auto'
         }} onClick={() => setShowModal(false)}>
           <div style={{
             background: '#0F0F15',
@@ -551,7 +603,8 @@ export const AdminDashboard: React.FC = () => {
             maxWidth: '800px',
             width: '90%',
             padding: '28px',
-            border: '1px solid rgba(229,9,20,0.5)'
+            border: '1px solid rgba(229,9,20,0.5)',
+            margin: '20px'
           }} onClick={(e) => e.stopPropagation()}>
             <h3 style={{ fontFamily: "'Orbitron', monospace", color: '#E50914', marginBottom: '20px' }}>
               {editingRecord ? <><i className="fas fa-edit"></i> Edit Warranty</> : <><i className="fas fa-plus-circle"></i> Add Warranty Record</>}
@@ -724,6 +777,19 @@ export const AdminDashboard: React.FC = () => {
           to {
             transform: scale(1);
             opacity: 1;
+          }
+        }
+        
+        /* Mobile responsive styles */
+        @media (max-width: 768px) {
+          .sidebar {
+            position: fixed;
+            z-index: 1000;
+          }
+          
+          .main-content {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
           }
         }
       `}</style>
