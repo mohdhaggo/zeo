@@ -48,16 +48,16 @@ export const TitanSatinPPFPage: React.FC = () => {
   }, [isHovering]);
 
   const galleryImages = [
-    { src: "/01-stain-ppf-blue.webp", alt: "TITAN SATIN PPF - Elegant Satin Finish Paint Protection" },
-    { src: "/02-stain-ppf-blue.webp", alt: "Premium vehicle with TITAN SATIN PPF installed" },
-    { src: "/03-stain-ppf-blue.webp", alt: "Satin finish texture closeup" },
-    { src: "/04-stain-ppf-blue.webp", alt: "Self-healing technology demonstration" }
+    { src: "/01-prime-ppf-white.webp", alt: "PRIME PPF - Premium Paint Protection" },
+    { src: "/02-prime-ppf-white.webp", alt: "Premium vehicle with PRIME PPF installed" },
+    { src: "/03-prime-ppf-white.webp", alt: "Finish texture closeup" },
+    { src: "/04-prime-ppf-white.webp", alt: "Self-healing technology demonstration" }
   ];
 
   const ppfProducts = [
-    { id: 1, name: "TITAN PPF", tag: "10 Year Warranty", image: "/01-titan-ppf-white.webp", url: "/titan-ppf" },
-    { id: 2, name: "ULTRA PPF", tag: "5 Year Warranty", image: "/01-ultra-ppf-red.webp", url: "/ultra-ppf" },
-    { id: 3, name: "TITAN SATIN PPF", tag: "Satin Finish", image: "/01-stain-ppf-blue.webp", url: "/titan-satin-ppf" }
+    { id: 1, name: "TITAN PPF", tag: "5 Year Warranty", image: "/01-titan-ppf-blue.webp", url: "/titan-ppf" },
+    { id: 2, name: "ULTRA PPF", tag: "8 Year Warranty", image: "/01-ultra-ppf-red.webp", url: "/ultra-ppf" },
+    { id: 3, name: "PRIME PPF", tag: "10 Year Warranty", image: "/01-prime-ppf-white.webp", url: "/titan-satin-ppf" }
   ];
 
   const visibleProducts = useMemo(() => {
@@ -147,7 +147,7 @@ export const TitanSatinPPFPage: React.FC = () => {
             marginBottom: '50px', 
             borderLeft: '3px solid #E50914' 
           }}>
-            SATIN FINISH | 10-YEAR WARRANTY
+            PREMIUM PROTECTION | 10-YEAR WARRANTY
           </div>
           <h1 style={{ 
             fontSize: 'clamp(2rem, 6vw, 3rem)', 
@@ -157,12 +157,12 @@ export const TitanSatinPPFPage: React.FC = () => {
             color: 'transparent', 
             marginBottom: '15px',
             lineHeight: '1.2'
-          }}>TITAN SATIN PPF</h1>
+          }}>PRIME PPF</h1>
           <p style={{ 
             color: '#aaa',
             fontSize: 'clamp(0.9rem, 3.5vw, 1rem)',
             padding: '0 15px'
-          }}>Premium satin finish paint protection that transforms glossy paint into a smooth, stealth appearance.</p>
+          }}>Premium paint protection that delivers exceptional clarity and a glossy appearance for your vehicle.</p>
         </div>
 
         {/* Product Layout */}
@@ -217,19 +217,19 @@ export const TitanSatinPPFPage: React.FC = () => {
               color: '#bbb', 
               marginBottom: '20px',
               fontSize: 'clamp(0.9rem, 3.5vw, 1rem)'
-            }}>TITAN SATIN PPF combines premium protection with a unique satin finish, giving your vehicle a bold and refined appearance. Designed for those who want to stand out, this film transforms glossy paint into a smooth satin texture while maintaining full protection against rocks, scratches, and environmental hazards.</p>
+            }}>PRIME PPF combines premium protection with exceptional clarity, giving your vehicle a brilliant, glossy appearance. Designed for those who want their vehicle to look its best, this film provides a crystal-clear shield that maintains the original beauty of your paint while offering maximum protection against rocks, scratches, and environmental hazards.</p>
             <p style={{ 
               lineHeight: '1.7', 
               color: '#bbb', 
               marginBottom: '20px',
               fontSize: 'clamp(0.9rem, 3.5vw, 1rem)'
-            }}>Built with advanced self-healing technology, the surface eliminates minor scratches and swirl marks, ensuring a consistent and clean finish over time. The satin finish creates a subtle, non-reflective appearance that exudes sophistication and stealth.</p>
+            }}>Built with advanced self-healing technology, the surface eliminates minor scratches and swirl marks, ensuring a consistent and clean finish over time. The high-gloss finish enhances the depth and richness of your vehicle's paint, making it look showroom-fresh for years to come.</p>
             <p style={{ 
               lineHeight: '1.7', 
               color: '#bbb', 
               marginBottom: '20px',
               fontSize: 'clamp(0.9rem, 3.5vw, 1rem)'
-            }}>The film also offers UV and stain resistance, protecting your vehicle from fading, discoloration, and environmental contaminants—perfect for extreme weather conditions across the Middle East, Asia, and global markets.</p>
+            }}>This product is particularly suitable for white cars, as the crystal-clear protection enhances the purity and brightness of white paint while reducing the appearance of minor imperfections. The film delivers exceptional clarity and a glossy appearance that makes white vehicles look pristine and showroom-fresh. PRIME PPF also offers UV and stain resistance, protecting your vehicle from fading, discoloration, and environmental contaminants—perfect for extreme weather conditions across the Middle East, Asia, and global markets.</p>
             <div className="thickness-options" style={{ 
               display: 'flex', 
               gap: '15px', 
@@ -254,7 +254,7 @@ export const TitanSatinPPFPage: React.FC = () => {
             }}>
               <i className="fas fa-palette" style={{ fontSize: 'clamp(1.2rem, 4vw, 1.5rem)', color: '#E50914' }}></i>
               <p style={{ marginTop: '8px', fontSize: 'clamp(0.85rem, 3vw, 0.95rem)' }}>
-                <strong>Elegant Satin Transformation</strong> — Converts gloss paint to a smooth, stealth satin finish
+                <strong>Premium Clarity & Protection</strong> — Crystal-clear shield with enhanced gloss and durability
               </p>
             </div>
           </div>
@@ -284,7 +284,7 @@ export const TitanSatinPPFPage: React.FC = () => {
                 fontSize: 'clamp(0.85rem, 3vw, 0.95rem)',
                 flexWrap: 'wrap'
               }}>
-                <i className="fas fa-palette" style={{ color: '#E50914', minWidth: '24px' }}></i> Elegant satin finish transformation
+                <i className="fas fa-palette" style={{ color: '#E50914', minWidth: '24px' }}></i> Exceptional clarity and high-gloss finish
               </li>
               <li style={{ 
                 padding: 'clamp(10px, 2vw, 12px) 0', 
@@ -396,8 +396,23 @@ export const TitanSatinPPFPage: React.FC = () => {
           <div style={{ display: 'flex', marginTop: '50px', gap: '20px', justifyContent: 'center', flexWrap: 'wrap' }}>
             <a href="/products" className="btn-outline-silver" style={{
               padding: 'clamp(10px, 3vw, 12px) clamp(20px, 5vw, 24px)',
-              fontSize: 'clamp(0.85rem, 3vw, 0.95rem)'
-            }}>View All Products</a>
+              fontSize: 'clamp(0.85rem, 3vw, 0.95rem)',
+              background: 'transparent',
+              border: '2px solid #E50914',
+              color: '#E50914',
+              textDecoration: 'none',
+              borderRadius: '40px',
+              transition: 'all 0.3s ease',
+              display: 'inline-block'
+            }} onMouseEnter={(e) => {
+              e.currentTarget.style.background = '#E50914';
+              e.currentTarget.style.color = 'white';
+            }} onMouseLeave={(e) => {
+              e.currentTarget.style.background = 'transparent';
+              e.currentTarget.style.color = '#E50914';
+            }}>
+              View All Products
+            </a>
           </div>
         </div>
 

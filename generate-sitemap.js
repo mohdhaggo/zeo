@@ -11,8 +11,6 @@ const routes = [
   { url: '/titan-ppf', priority: '0.7', changefreq: 'weekly' },
   { url: '/ultra-ppf', priority: '0.7', changefreq: 'weekly' },
   { url: '/titan-satin-ppf', priority: '0.7', changefreq: 'weekly' },
-  { url: '/admin-login', priority: '0.5', changefreq: 'monthly' },
-  { url: '/dashboard', priority: '0.5', changefreq: 'monthly' },
 ];
 
 // Update with your custom domain

@@ -6,19 +6,19 @@ export const ProductGrid: React.FC = () => {
       name: 'TITAN PPF',
       shortDesc: 'Maximum protection PPF with 10-year durability',
       imgUrl: '/01-titan-ppf-white.webp',
-      badge: '10 YEAR WARRANTY'
+      badge: '5 YEAR WARRANTY'
     },
     {
       name: 'ULTRA PPF',
       shortDesc: 'Reliable protection with advanced technology',
       imgUrl: '/01-ultra-ppf-red.webp',
-      badge: '5 YEAR WARRANTY'
+      badge: '8 YEAR WARRANTY'
     },
     {
-      name: 'TITAN SATIN PPF',
+      name: 'PRIME PPF',
       shortDesc: 'Premium satin finish with ultimate protection',
       imgUrl: '/01-stain-ppf-blue.webp',
-      badge: 'SATIN FINISH'
+      badge: '10 YEAR WARRANTY'
     }
   ];
 

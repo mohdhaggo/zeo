@@ -54,9 +54,9 @@ export const UltraPPFPage: React.FC = () => {
   ];
 
   const ppfProducts = [
-    { id: 1, name: "TITAN PPF", tag: "10 Year Warranty", image: "/01-titan-ppf-white.webp", url: "/titan-ppf" },
-    { id: 2, name: "ULTRA PPF", tag: "5 Year Warranty", image: "/01-ultra-ppf-red.webp", url: "/ultra-ppf" },
-    { id: 3, name: "TITAN SATIN PPF", tag: "Satin Finish", image: "/01-stain-ppf-blue.webp", url: "/titan-satin-ppf" }
+    { id: 1, name: "TITAN PPF", tag: "5 Year Warranty", image: "/01-titan-ppf-blue.webp", url: "/titan-ppf" },
+    { id: 2, name: "ULTRA PPF", tag: "8 Year Warranty", image: "/01-ultra-ppf-red.webp", url: "/ultra-ppf" },
+    { id: 3, name: "PRIME PPF", tag: "10 Year Warranty", image: "/01-prime-ppf-white.webp", url: "/titan-satin-ppf" }
   ];
 
   const visibleProducts = useMemo(() => {
@@ -146,33 +146,22 @@ export const UltraPPFPage: React.FC = () => {
             marginBottom: '50px', 
             borderLeft: '3px solid #E50914' 
           }}>
-            HIGH-PERFORMANCE VALUE | 5-YEAR WARRANTY
+            HIGH-PERFORMANCE VALUE | 8-YEAR WARRANTY
           </div>
-          
           <h1 style={{ 
-            fontSize: 'clamp(2rem, 6vw, 3.5rem)', 
+            fontSize: 'clamp(2rem, 6vw, 3rem)', 
             background: 'linear-gradient(135deg, #FFFFFF, #E50914)', 
             WebkitBackgroundClip: 'text', 
             backgroundClip: 'text', 
             color: 'transparent', 
-            marginBottom: 'clamp(15px, 4vw, 20px)',
-            marginTop: 0,
-            lineHeight: '1.2',
-            fontWeight: 'bold'
-          }}>
-            ULTRA PPF
-          </h1>
-          
+            marginBottom: '15px',
+            lineHeight: '1.2'
+          }}>ULTRA PPF</h1>
           <p style={{ 
             color: '#aaa',
-            fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
-            maxWidth: '700px',
-            margin: '0 auto',
-            padding: '0 15px',
-            lineHeight: '1.6'
-          }}>
-            High-quality paint protection with self-healing technology and crystal-clear finish for everyday driving.
-          </p>
+            fontSize: 'clamp(0.9rem, 3.5vw, 1rem)',
+            padding: '0 15px'
+          }}>High-quality paint protection with self-healing technology and crystal-clear finish for everyday driving.</p>
         </div>
 
         {/* Product Layout - Image Gallery & Info */}
@@ -409,7 +398,7 @@ export const UltraPPFPage: React.FC = () => {
             border: '1px solid rgba(229,9,20,0.3)' 
           }}>
             <i className="fas fa-shield-alt" style={{ fontSize: 'clamp(2rem, 6vw, 2.8rem)', color: '#E50914', marginBottom: '15px' }}></i>
-            <h3 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.5rem)', marginBottom: '10px' }}>5-Year Warranty</h3>
+            <h3 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.5rem)', marginBottom: '10px' }}>8-Year Warranty</h3>
             <p style={{ fontSize: 'clamp(0.85rem, 3vw, 0.95rem)', lineHeight: '1.6' }}>
               Reliable choice for daily drivers and car enthusiasts seeking quality protection.
             </p>

@@ -15,9 +15,9 @@ export const PPFPage: React.FC = () => {
   }, []);
 
   const products = [
-    { name: 'TITAN PPF', shortDesc: 'Maximum protection PPF with 10-year durability', imgUrl: '/01-titan-ppf-white.webp', badge: '10 YEAR WARRANTY', url: '/titan-ppf' },
-    { name: 'ULTRA PPF', shortDesc: 'Reliable protection with advanced technology', imgUrl: '/01-ultra-ppf-red.webp', badge: '5 YEAR WARRANTY', url: '/ultra-ppf' },
-    { name: 'TITAN SATIN PPF', shortDesc: 'Premium satin finish with ultimate protection', imgUrl: '/01-stain-ppf-blue.webp', badge: '10 YEAR WARRANTY', url: '/titan-satin-ppf' }
+    { name: 'TITAN PPF', shortDesc: 'Maximum protection PPF with long durability', imgUrl: '/01-titan-ppf-blue.webp', badge: '5 YEAR WARRANTY', url: '/titan-ppf' },
+    { name: 'ULTRA PPF', shortDesc: 'Reliable protection with advanced technology', imgUrl: '/01-ultra-ppf-red.webp', badge: '8 YEAR WARRANTY', url: '/ultra-ppf' },
+    { name: 'PRIME PPF', shortDesc: 'Premium satin finish with ultimate protection', imgUrl: '/01-prime-ppf-white.webp', badge: '10 YEAR WARRANTY', url: '/titan-satin-ppf' }
   ];
 
   const handleProductClick = (url: string) => {

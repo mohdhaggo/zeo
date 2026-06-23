@@ -47,16 +47,16 @@ export const TitanPPFPage: React.FC = () => {
   }, [isHovering]);
 
   const galleryImages = [
-    { src: "/01-titan-ppf-white.webp", alt: "TITAN PPF - Maximum Protection Paint Protection Film" },
-    { src: "/02-titan-ppf-white.webp", alt: "Premium vehicle with TITAN PPF installed" },
-    { src: "/03-titan-ppf-white.webp", alt: "Self-healing technology demonstration" },
-    { src: "/04-titan-ppf-white.webp", alt: "High-gloss finish showcase" }
+    { src: "/01-titan-ppf-blue.webp", alt: "TITAN PPF - Maximum Protection Paint Protection Film" },
+    { src: "/02-titan-ppf-blue.webp", alt: "Premium vehicle with TITAN PPF installed" },
+    { src: "/03-titan-ppf-blue.webp", alt: "Self-healing technology demonstration" },
+    { src: "/04-titan-ppf-blue.webp", alt: "High-gloss finish showcase" }
   ];
 
   const ppfProducts = [
-    { id: 1, name: "TITAN PPF", tag: "10 Year Warranty", image: "/01-titan-ppf-white.webp", url: "/titan-ppf" },
-    { id: 2, name: "ULTRA PPF", tag: "5 Year Warranty", image: "/01-ultra-ppf-red.webp", url: "/ultra-ppf" },
-    { id: 3, name: "TITAN SATIN PPF", tag: "Satin Finish", image: "/01-stain-ppf-blue.webp", url: "/titan-satin-ppf" }
+    { id: 1, name: "TITAN PPF", tag: "5 Year Warranty", image: "/01-titan-ppf-blue.webp", url: "/titan-ppf" },
+    { id: 2, name: "ULTRA PPF", tag: "8 Year Warranty", image: "/01-ultra-ppf-red.webp", url: "/ultra-ppf" },
+    { id: 3, name: "PRIME PPF", tag: "10 Year Warranty", image: "/01-prime-ppf-white.webp", url: "/titan-satin-ppf" }
   ];
 
   const visibleProducts = useMemo(() => {
@@ -146,33 +146,22 @@ export const TitanPPFPage: React.FC = () => {
             marginBottom: '50px', 
             borderLeft: '3px solid #E50914' 
           }}>
-            FLAGSHIP PROTECTION | 10-YEAR WARRANTY
+            FLAGSHIP PROTECTION | 5-YEAR WARRANTY
           </div>
-          
           <h1 style={{ 
-            fontSize: 'clamp(2rem, 6vw, 3.5rem)', 
+            fontSize: 'clamp(2rem, 6vw, 3rem)', 
             background: 'linear-gradient(135deg, #FFFFFF, #E50914)', 
             WebkitBackgroundClip: 'text', 
             backgroundClip: 'text', 
             color: 'transparent', 
-            marginBottom: 'clamp(15px, 4vw, 20px)',
-            marginTop: 0,
-            lineHeight: '1.2',
-            fontWeight: 'bold'
-          }}>
-            TITAN PPF
-          </h1>
-          
+            marginBottom: '15px',
+            lineHeight: '1.2'
+          }}>TITAN PPF</h1>
           <p style={{ 
             color: '#aaa',
-            fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)',
-            maxWidth: '700px',
-            margin: '0 auto',
-            padding: '0 15px',
-            lineHeight: '1.6'
-          }}>
-            Maximum protection paint protection film with 10-year durability for luxury and high-performance vehicles.
-          </p>
+            fontSize: 'clamp(0.9rem, 3.5vw, 1rem)',
+            padding: '0 15px'
+          }}>Maximum protection paint protection film with long durability for luxury and high-performance vehicles.</p>
         </div>
 
         {/* Product Layout - Image Gallery & Info */}
@@ -271,7 +260,7 @@ export const TitanPPFPage: React.FC = () => {
               marginBottom: 'clamp(20px, 4vw, 25px)',
               fontSize: 'clamp(0.9rem, 3.5vw, 1rem)'
             }}>
-              Backed by a 10-year warranty, TITAN PPF is built for long-term reliability, making it the ultimate choice for luxury and high-performance vehicles.
+              Backed by a 5-year warranty, TITAN PPF is built for long-term reliability, making it the ultimate choice for luxury and high-performance vehicles.
             </p>
             
             <div className="thickness-options" style={{ 
@@ -404,7 +393,7 @@ export const TitanPPFPage: React.FC = () => {
                 flexWrap: 'wrap'
               }}>
                 <i className="fas fa-certificate" style={{ color: '#E50914', minWidth: '24px' }}></i> 
-                10-year warranty for peace of mind
+                5-year warranty for peace of mind
               </li>
             </ul>
           </div>
@@ -418,7 +407,7 @@ export const TitanPPFPage: React.FC = () => {
             border: '1px solid rgba(229,9,20,0.3)' 
           }}>
             <i className="fas fa-shield-alt" style={{ fontSize: 'clamp(2rem, 6vw, 2.8rem)', color: '#E50914', marginBottom: '15px' }}></i>
-            <h3 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.5rem)', marginBottom: '10px' }}>10-Year Warranty</h3>
+            <h3 style={{ fontSize: 'clamp(1.2rem, 4vw, 1.5rem)', marginBottom: '10px' }}>5-Year Warranty</h3>
             <p style={{ fontSize: 'clamp(0.85rem, 3vw, 0.95rem)', lineHeight: '1.6' }}>
               Built for long-term reliability — the ultimate choice for luxury and high-performance vehicles. Backed by Zeo Shields global warranty.
             </p>
@@ -515,7 +504,8 @@ export const TitanPPFPage: React.FC = () => {
               color: '#E50914',
               textDecoration: 'none',
               borderRadius: '40px',
-              transition: 'all 0.3s ease'
+              transition: 'all 0.3s ease',
+              display: 'inline-block'
             }} onMouseEnter={(e) => {
               e.currentTarget.style.background = '#E50914';
               e.currentTarget.style.color = 'white';
