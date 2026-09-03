@@ -310,7 +310,10 @@ h1, h2, h3, .logo-font, .nav-link, .btn, .card-category {
   align-items: baseline;
   flex-wrap: wrap;
   gap: 18px;
-  margin-bottom: 20px;
+  /* h1 element: reset the user-agent margin and font sizing. */
+  margin: 0 0 20px;
+  font-size: inherit;
+  font-weight: inherit;
 }
 
 .static-prefix {

@@ -1,8 +1,11 @@
 import React, { useState, useRef } from 'react';
 import ReCAPTCHA from 'react-google-recaptcha';
-import { contactService } from '../../services/contactService';
+import { contactService } from '../../services/contact';
 
-const RECAPTCHA_SITE_KEY = '6LeE1uYsAAAAAOQ-e0UgE3IXPG3D5pI4uJLdSizb';
+// Set VITE_RECAPTCHA_SITE_KEY in the Amplify console. The paired secret key
+// lives server-side as the RECAPTCHA_SECRET Amplify secret - the token is only
+// meaningful once the Lambda verifies it with Google.
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? '';
 
 export const ContactForm: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -247,11 +250,17 @@ export const ContactForm: React.FC = () => {
           flexWrap: 'wrap',
           gap: '15px'
         }}>
-          <ReCAPTCHA
-            ref={recaptchaRef}
-            sitekey={RECAPTCHA_SITE_KEY}
-            onChange={handleRecaptchaChange}
-          />
+          {RECAPTCHA_SITE_KEY ? (
+            <ReCAPTCHA
+              ref={recaptchaRef}
+              sitekey={RECAPTCHA_SITE_KEY}
+              onChange={handleRecaptchaChange}
+            />
+          ) : (
+            <span style={{ color: '#e74c3c', fontSize: '0.85rem' }}>
+              reCAPTCHA is not configured. Set VITE_RECAPTCHA_SITE_KEY.
+            </span>
+          )}
         </div>
         
         {message && (

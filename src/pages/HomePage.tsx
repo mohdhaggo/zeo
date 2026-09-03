@@ -126,14 +126,14 @@ export const HomePage: React.FC = () => {
           <div className="hero-badge">
             <i className="fas fa-shield-haltered"></i> ENGINEERED FOR THE MIDDLE EAST, ASIA & BEYOND
           </div>
-          <div className="animated-word-container">
+          <h1 className="animated-word-container">
             <span className="static-prefix">Ultimate</span>
             <div className="word-wrapper" ref={wordWrapperRef}>
               <span className="animated-word" style={{ animation: isAnimating ? 'wordFade 0.4s ease-out' : 'none' }}>
                 {currentWord}
               </span>
             </div>
-          </div>
+          </h1>
           <p className="hero-subtitle">PPF, Window Tint & Windshield Film — engineered for extreme climates, high-speed roads, and global performance standards.</p>
           <div className="hero-buttons">
             <a href="/products" className="btn-primary">Explore Products</a>
@@ -203,7 +203,7 @@ export const HomePage: React.FC = () => {
         .hero::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(95deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.7) 100%); z-index: 1; }
         .hero .container { position: relative; z-index: 2; }
         .hero-badge { background: rgba(229,9,20,0.2); backdrop-filter: blur(8px); border-radius: 60px; padding: 8px 20px; display: inline-block; margin-bottom: 30px; font-weight: 600; border-left: 3px solid #E50914; }
-        .animated-word-container { display: flex; align-items: baseline; flex-wrap: wrap; gap: 18px; margin-bottom: 20px; }
+        .animated-word-container { display: flex; align-items: baseline; flex-wrap: wrap; gap: 18px; margin: 0 0 20px; font-size: inherit; font-weight: inherit; }
         .static-prefix { font-size: 4rem; font-weight: 800; font-family: 'Orbitron', monospace; color: white; line-height: 1.2; white-space: nowrap; }
         .animated-word { display: inline-block; font-weight: 800; font-family: 'Orbitron', monospace; background: linear-gradient(135deg, #E50914, #FF6B6B); -webkit-background-clip: text; background-clip: text; color: transparent; font-size: 4rem; line-height: 1.2; white-space: nowrap; }
         .hero-subtitle { font-size: 1.2rem; max-width: 580px; margin: 20px 0 30px; }

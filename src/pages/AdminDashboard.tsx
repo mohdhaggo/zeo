@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { generateClient } from 'aws-amplify/data';
+import { signOut } from 'aws-amplify/auth';
 import type { Schema } from '../../amplify/data/resource';
 
-const client = generateClient<Schema>();
+// Admin reads go through the Cognito user pool; the API rejects the request
+// outright if the caller is not a signed-in user.
+const client = generateClient<Schema>({ authMode: 'userPool' });
 
 interface WarrantyRecord {
   id: string;
@@ -57,11 +60,7 @@ export const AdminDashboard: React.FC = () => {
   });
 
   useEffect(() => {
-    const isAuthenticated = localStorage.getItem('adminAuthenticated');
-    if (!isAuthenticated) {
-      window.location.href = '/admin-login';
-      return;
-    }
+    // AdminApp verified the Cognito session before mounting this page.
     fetchData();
 
     // Check screen size for initial sidebar state
@@ -95,10 +94,12 @@ export const AdminDashboard: React.FC = () => {
     }
   };
 
-  const handleLogout = () => {
-    localStorage.removeItem('adminAuthenticated');
-    localStorage.removeItem('adminEmail');
-    window.location.href = '/admin-login';
+  const handleLogout = async () => {
+    try {
+      await signOut();
+    } catch (error) {
+      console.error('Sign-out failed:', error);
+    }
   };
 
   const handleAddWarranty = () => {

@@ -69,7 +69,12 @@ const PasswordInput = ({
   );
 };
 
-export const AdminLoginPage: React.FC = () => {
+interface AdminLoginPageProps {
+  /** Called once Cognito confirms the sign-in. */
+  onSignedIn?: () => void;
+}
+
+export const AdminLoginPage: React.FC<AdminLoginPageProps> = ({ onSignedIn }) => {
   const [step, setStep] = useState<'login' | 'otp' | 'resetEmail' | 'resetOtp' | 'resetNewPassword'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -111,9 +116,7 @@ export const AdminLoginPage: React.FC = () => {
         });
         setStep('otp');
       } else if (nextStep.signInStep === 'DONE') {
-        localStorage.setItem('adminAuthenticated', 'true');
-        localStorage.setItem('adminEmail', email);
-        window.location.href = '/dashboard';
+        onSignedIn?.();
       } else {
         setMessage({ 
           type: 'error', 
@@ -146,9 +149,7 @@ export const AdminLoginPage: React.FC = () => {
       });
       
       if (nextStep.signInStep === 'DONE') {
-        localStorage.setItem('adminAuthenticated', 'true');
-        localStorage.setItem('adminEmail', email);
-        window.location.href = '/dashboard';
+        onSignedIn?.();
       } else {
         setMessage({ type: 'error', text: 'Verification failed. Please try again.' });
       }
