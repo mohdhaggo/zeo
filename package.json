@@ -8,8 +8,7 @@
     "build": "node generate-sitemap.js && tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "build:admin": "tsc && vite build --mode admin && node scripts/finalize-admin.js",
-    "dev:pages": "npm run build && wrangler pages dev dist --port 4173"
+    "dev:pages": "npm run build && wrangler pages dev dist --port 4175"
   },
   "dependencies": {
     "react": "~18.3.1",

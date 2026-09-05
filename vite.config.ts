@@ -6,21 +6,26 @@ import { fileURLToPath } from 'node:url';
 const projectRoot = fileURLToPath(new URL('.', import.meta.url));
 
 /**
- * Two builds from one codebase:
+ * One build, two entry documents:
  *
- *   vite build                -> public site  (index.html  -> src/main.tsx)
- *   vite build --mode admin   -> admin console (admin.html -> src/admin/main.tsx)
+ *   index.html  -> src/main.tsx        the public site
+ *   admin.html  -> src/admin/main.tsx  the admin console
  *
- * They are deployed as separate Amplify apps, so the admin bundle is never
- * served to public visitors.
+ * Cloudflare Pages allows only one project per repository, so both are served
+ * from the same deployment and functions/_middleware.ts routes between them by
+ * hostname. Rollup still splits them into separate chunks; only genuinely
+ * shared code (React, the router) ends up in a common chunk.
  */
-export default defineConfig(({ mode }) => ({
+export default defineConfig({
   plugins: [react()],
   build: {
     outDir: 'dist',
     emptyOutDir: true,
     rollupOptions: {
-      input: mode === 'admin' ? resolve(projectRoot, 'admin.html') : resolve(projectRoot, 'index.html'),
+      input: {
+        main: resolve(projectRoot, 'index.html'),
+        admin: resolve(projectRoot, 'admin.html'),
+      },
     },
   },
-}));
+});
