@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '../../amplify/data/resource';
 
-// Guest access via the Cognito identity pool. Reads of the Warranty table
-// are not permitted from the browser at all - the two custom operations
-// below run server-side and return no customer PII.
-const client = generateClient<Schema>();
+const WARRANTY_UNAVAILABLE_NOTICE =
+  'Warranty checking is temporarily unavailable while we upgrade our systems. Please contact us and we will verify your warranty for you.';
 
 interface WarrantyData {
   warrantyNumber: string;
@@ -18,12 +14,15 @@ interface WarrantyData {
 
 export const WarrantyPage: React.FC = () => {
   const [warrantyId, setWarrantyId] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [loading] = useState(false);
+  const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' | 'info' } | null>({
+    text: WARRANTY_UNAVAILABLE_NOTICE,
+    type: 'info',
+  });
   const [warrantyDetails, setWarrantyDetails] = useState<WarrantyData | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [successData, setSuccessData] = useState({ warrantyId: '', registeredTo: '' });
+  const [successData] = useState({ warrantyId: '', registeredTo: '' });
   const [regFormData, setRegFormData] = useState({
     fullName: '',
     mobile: '',
@@ -45,106 +44,24 @@ export const WarrantyPage: React.FC = () => {
   }, []);
 
   // Check warranty using AWS Amplify with public access
-  const checkWarranty = async (warrantyNumber: string) => {
-    if (!warrantyNumber.trim()) {
-      setMessage({ text: '⚠️ Please enter a Warranty ID.', type: 'error' });
-      return;
-    }
-
-    setLoading(true);
-    setMessage(null);
+  // Warranty lookup is offline between the AWS teardown and the Cloudflare
+  // rebuild. The previous implementation called an AppSync API whose key
+  // expired in July, so visitors were seeing a raw 401 - this at least tells
+  // them what to do instead. Stage 3 restores the real lookup.
+  const showUnavailable = () => {
     setWarrantyDetails(null);
+    setMessage({ text: WARRANTY_UNAVAILABLE_NOTICE, type: 'info' });
+  };
 
-    try {
-      const { data, errors } = await client.queries.validateWarranty({ warrantyNumber });
-
-      if (errors?.length) {
-        throw new Error(errors[0].message);
-      }
-
-      if (data?.found) {
-        setWarrantyDetails({
-          warrantyNumber: data.warrantyNumber || warrantyNumber,
-          productName: data.productName || '-',
-          manufactureDate: data.manufactureDate || '-',
-          status: data.status || 'UNREGISTERED',
-          registrationDate: data.registrationDate || '-',
-          eligibleForRegistration: data.eligibleForRegistration ?? false,
-        });
-
-        if (data.status === 'ACTIVE') {
-          setMessage({ text: '✅ This warranty is already registered.', type: 'success' });
-        } else {
-          setMessage({ text: '✅ Valid warranty! This product is eligible for registration.', type: 'success' });
-        }
-      } else {
-        setMessage({ text: '❌ ' + (data?.message || 'Warranty ID not found in the system.'), type: 'error' });
-      }
-    } catch (error) {
-      console.error('Error checking warranty:', error);
-      const detail = error instanceof Error ? error.message : 'Connection error. Please try again.';
-      setMessage({ text: '❌ ' + detail, type: 'error' });
-    } finally {
-      setLoading(false);
-    }
+  // Signature preserved so stage 3 can restore the lookup without touching
+  // the call sites.
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const checkWarranty = async (_warrantyNumber: string) => {
+    showUnavailable();
   };
 
   const registerWarranty = async () => {
-    if (!warrantyDetails) {
-      setMessage({ text: 'Please validate a warranty first.', type: 'error' });
-      return;
-    }
-
-    const { fullName, mobile, email, country, purchaseDate } = regFormData;
-
-    if (!fullName || !mobile || !email || !country) {
-      setMessage({ text: 'Please fill in all required fields.', type: 'error' });
-      return;
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setMessage({ text: 'Please enter a valid email address.', type: 'error' });
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      // The Lambda re-checks that the warranty exists and is still
-      // unregistered, so this cannot be bypassed from the client.
-      const { data, errors } = await client.mutations.registerWarranty({
-        warrantyNumber: warrantyDetails.warrantyNumber,
-        customerName: fullName,
-        email,
-        phone: mobile,
-        purchaseCountry: country,
-        purchaseDate: purchaseDate || new Date().toISOString().split('T')[0],
-      });
-
-      if (errors?.length) {
-        throw new Error(errors[0].message);
-      }
-
-      if (!data?.success) {
-        setMessage({ text: '❌ ' + (data?.message || 'Registration failed.'), type: 'error' });
-        return;
-      }
-
-      setShowModal(false);
-      setSuccessData({
-        warrantyId: warrantyDetails.warrantyNumber,
-        registeredTo: fullName,
-      });
-      setShowSuccessModal(true);
-      handleReset();
-    } catch (error) {
-      console.error('Error registering warranty:', error);
-      const detail = error instanceof Error ? error.message : 'Please try again.';
-      setMessage({ text: 'Registration failed: ' + detail, type: 'error' });
-    } finally {
-      setLoading(false);
-    }
+    showUnavailable();
   };
 
   const handleReset = () => {

@@ -1,15 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { Amplify } from 'aws-amplify';
 import App from './App';
-import outputs from '../amplify_outputs.json';
 import './index.css';
 
-// Configure Amplify
-Amplify.configure(outputs);
-
+// The public site talks to Cloudflare Pages Functions over plain fetch, so it
+// no longer configures the Amplify SDK. The admin app still does, until the
+// admin portal moves across.
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <App />
-  </React.StrictMode>
+  </React.StrictMode>,
 );

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { generateClient } from 'aws-amplify/data';
-import type { Schema } from '../../amplify/data/resource';
+import React, { useState, useEffect, useRef } from 'react';
+import { Turnstile, type TurnstileHandle } from '../components/common/Turnstile';
 
-const client = generateClient<Schema>();
+// Public key. The paired secret lives only in the Pages Function environment,
+// which is what makes the token meaningful.
+const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY ?? '';
 
 export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -15,11 +16,8 @@ export const ContactPage: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
-  const [captchaQuestion, setCaptchaQuestion] = useState('');
-  const [captchaAnswer, setCaptchaAnswer] = useState('');
-  const [captchaExpected, setCaptchaExpected] = useState<number | null>(null);
-  const [captchaStatus, setCaptchaStatus] = useState('Solve the math problem to continue');
-  const [captchaValid, setCaptchaValid] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const turnstileRef = useRef<TurnstileHandle>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
@@ -31,58 +29,9 @@ export const ContactPage: React.FC = () => {
     }, { threshold: 0.1 });
     
     fadeElements.forEach(el => observer.observe(el));
-    
-    generateCaptcha();
-    
+
     return () => observer.disconnect();
   }, []);
-
-  const generateCaptcha = () => {
-    const num1 = Math.floor(Math.random() * 20) + 1;
-    const num2 = Math.floor(Math.random() * 20) + 1;
-    const operators = ['+', '-'];
-    const operator = operators[Math.floor(Math.random() * operators.length)];
-    
-    let question: string;
-    let answer: number;
-    
-    if (operator === '+') {
-      question = `${num1} + ${num2}`;
-      answer = num1 + num2;
-    } else {
-      if (num1 >= num2) {
-        question = `${num1} - ${num2}`;
-        answer = num1 - num2;
-      } else {
-        question = `${num2} - ${num1}`;
-        answer = num2 - num1;
-      }
-    }
-    
-    setCaptchaQuestion(question);
-    setCaptchaExpected(answer);
-    setCaptchaAnswer('');
-    setCaptchaStatus('Solve the math problem to continue');
-    setCaptchaValid(false);
-  };
-
-  const validateCaptcha = (value: string) => {
-    setCaptchaAnswer(value);
-    if (value === '') {
-      setCaptchaStatus('Solve the math problem to continue');
-      setCaptchaValid(false);
-      return;
-    }
-    
-    const userAnswer = parseInt(value);
-    if (!isNaN(userAnswer) && userAnswer === captchaExpected) {
-      setCaptchaStatus('✓ Correct! You can now send the message.');
-      setCaptchaValid(true);
-    } else if (value !== '') {
-      setCaptchaStatus('✗ Incorrect answer. Please try again.');
-      setCaptchaValid(false);
-    }
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     setFormData({
@@ -105,30 +54,25 @@ export const ContactPage: React.FC = () => {
       return;
     }
     
-    if (!captchaValid) {
-      setMessage({ type: 'error', text: 'Please solve the math problem correctly.' });
+    if (!turnstileToken) {
+      setMessage({ type: 'error', text: 'Please complete the verification challenge.' });
       return;
     }
     
     setLoading(true);
     
     try {
-      // Save to AWS Amplify/DynamoDB
-      const { errors } = await client.models.ContactSubmission.create({
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        region: formData.region,
-        interest: formData.interest,
-        message: formData.message,
-        status: 'PENDING',
-        createdAt: new Date().toISOString()
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, turnstileToken }),
       });
 
-      if (errors) {
-        throw new Error(errors[0].message);
+      const result = (await response.json()) as { success: boolean; message: string };
+      if (!result.success) {
+        throw new Error(result.message);
       }
-      
+
       // Reset form
       setFormData({ 
         name: '', 
@@ -138,12 +82,14 @@ export const ContactPage: React.FC = () => {
         interest: '', 
         message: '' 
       });
-      generateCaptcha();
+      turnstileRef.current?.reset();
+      setTurnstileToken(null);
       setShowSuccessModal(true);
       
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error submitting contact form:', error);
-      setMessage({ type: 'error', text: error.message || 'Failed to send message. Please try again.' });
+      const detail = error instanceof Error ? error.message : 'Failed to send message. Please try again.';
+      setMessage({ type: 'error', text: detail });
     } finally {
       setLoading(false);
     }
@@ -372,78 +318,28 @@ export const ContactPage: React.FC = () => {
                   />
                 </div>
 
-                {/* Math CAPTCHA */}
+                {/* Bot check. The token is only trusted after /api/contact
+                    verifies it with Cloudflare server-side. */}
                 <div style={{
                   background: '#0F0F15',
                   padding: 'clamp(15px, 4vw, 20px)',
                   borderRadius: '16px',
                   margin: '20px 0',
-                  border: '1px solid #2A2A35',
-                  textAlign: 'center'
+                  display: 'flex',
+                  justifyContent: 'center'
                 }}>
-                  <div style={{
-                    fontSize: 'clamp(1rem, 4vw, 1.3rem)',
-                    color: '#E50914',
-                    marginBottom: '15px',
-                    fontFamily: "'Orbitron', monospace",
-                    wordBreak: 'break-word'
-                  }}>
-                    <span style={{ color: 'white', fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', margin: '0 5px' }}>🔐</span>
-                    {captchaQuestion} = ?
-                    <span style={{ color: 'white', fontSize: 'clamp(1.2rem, 5vw, 1.5rem)', margin: '0 5px' }}>❓</span>
-                  </div>
-                  <div className="captcha-input-group" style={{ 
-                    display: 'flex', 
-                    gap: '10px', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    flexWrap: 'wrap',
-                    flexDirection: 'column'
-                  }}>
-                    <input 
-                      type="number" 
-                      value={captchaAnswer} 
-                      onChange={(e) => validateCaptcha(e.target.value)}
-                      placeholder="Enter your answer" 
-                      autoComplete="off"
-                      style={{ 
-                        width: 'clamp(100px, 70%, 120px)', 
-                        textAlign: 'center', 
-                        fontSize: 'clamp(1rem, 4vw, 1.1rem)', 
-                        padding: '10px', 
-                        background: '#13131A', 
-                        border: '1px solid #2A2A35', 
-                        borderRadius: '16px', 
-                        color: 'white', 
-                        outline: 'none', 
-                        boxSizing: 'border-box'
-                      }}
+                  {TURNSTILE_SITE_KEY ? (
+                    <Turnstile
+                      ref={turnstileRef}
+                      siteKey={TURNSTILE_SITE_KEY}
+                      onVerify={setTurnstileToken}
+                      onExpire={() => setTurnstileToken(null)}
                     />
-                    <button 
-                      type="button" 
-                      onClick={generateCaptcha}
-                      style={{
-                        background: '#2C2C36',
-                        color: 'white',
-                        border: 'none',
-                        padding: '10px 15px',
-                        borderRadius: '40px',
-                        cursor: 'pointer',
-                        transition: '0.2s',
-                        fontFamily: "'Orbitron', monospace",
-                        fontSize: 'clamp(0.75rem, 3.5vw, 0.8rem)',
-                        whiteSpace: 'nowrap'
-                      }}>
-                      <i className="fas fa-sync-alt"></i> New
-                    </button>
-                  </div>
-                  <div style={{
-                    fontSize: 'clamp(0.7rem, 3vw, 0.75rem)',
-                    marginTop: '10px',
-                    color: captchaValid ? '#4caf50' : '#888'
-                  }}>
-                    {captchaStatus}
-                  </div>
+                  ) : (
+                    <span style={{ color: '#e74c3c', fontSize: '0.85rem' }}>
+                      Verification is not configured. Set VITE_TURNSTILE_SITE_KEY.
+                    </span>
+                  )}
                 </div>
 
                 {message && (
@@ -667,12 +563,8 @@ export const ContactPage: React.FC = () => {
           box-shadow: 0 0 0 2px rgba(229,9,20,0.2) !important; 
         }
         
-        /* CAPTCHA and Support contact responsive styles */
+        /* Support contact responsive styles */
         @media (min-width: 480px) {
-          .captcha-input-group {
-            flex-direction: row !important;
-          }
-          
           .support-contact-group {
             flex-direction: row !important;
           }
