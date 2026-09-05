@@ -1,8 +1,8 @@
 /**
  * D1 row mapping.
  *
- * The database uses snake_case; the admin UI already speaks camelCase. Mapping
- * here keeps the SQL idiomatic without rewriting the dashboard's shapes.
+ * The database uses snake_case. Only the public projection lives here; the
+ * admin console keeps its own copy in the zeoshields-admin repository.
  */
 export interface WarrantyRow {
   id: string;
@@ -19,35 +19,6 @@ export interface WarrantyRow {
   created_at: string;
 }
 
-export interface ContactRow {
-  id: string;
-  name: string;
-  email: string;
-  phone: string | null;
-  region: string;
-  interest: string;
-  message: string;
-  status: string;
-  created_at: string;
-}
-
-export function warrantyToJson(row: WarrantyRow) {
-  return {
-    id: row.id,
-    warrantyNumber: row.warranty_number,
-    productName: row.product_name,
-    manufactureDate: row.manufacture_date ?? undefined,
-    status: row.status,
-    registrationDate: row.registration_date ?? undefined,
-    customerName: row.customer_name ?? undefined,
-    phone: row.phone ?? undefined,
-    email: row.email ?? undefined,
-    purchaseDate: row.purchase_date ?? undefined,
-    purchaseCountry: row.purchase_country ?? undefined,
-    createdAt: row.created_at,
-  };
-}
-
 /** Public-safe projection: never includes customer name, phone or email. */
 export function warrantyToPublicJson(row: WarrantyRow) {
   return {
@@ -58,20 +29,6 @@ export function warrantyToPublicJson(row: WarrantyRow) {
     status: row.status,
     registrationDate: row.registration_date ?? undefined,
     eligibleForRegistration: row.status === 'UNREGISTERED',
-  };
-}
-
-export function contactToJson(row: ContactRow) {
-  return {
-    id: row.id,
-    name: row.name,
-    email: row.email,
-    phone: row.phone ?? undefined,
-    region: row.region,
-    interest: row.interest,
-    message: row.message,
-    status: row.status,
-    createdAt: row.created_at,
   };
 }
 
