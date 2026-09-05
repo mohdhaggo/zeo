@@ -1,38 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { generateClient } from 'aws-amplify/data';
-import { signOut } from 'aws-amplify/auth';
-import type { Schema } from '../../amplify/data/resource';
-
-// Admin reads go through the Cognito user pool; the API rejects the request
-// outright if the caller is not a signed-in user.
-const client = generateClient<Schema>({ authMode: 'userPool' });
-
-interface WarrantyRecord {
-  id: string;
-  warrantyNumber: string;
-  productName: string;
-  manufactureDate?: string;
-  status: string;
-  registrationDate?: string;
-  customerName?: string;
-  phone?: string;
-  email?: string;
-  purchaseDate?: string;
-  purchaseCountry?: string;
-  createdAt?: string;
-}
-
-interface ContactSubmission {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  region: string;
-  interest: string;
-  message: string;
-  status: string;
-  createdAt: string;
-}
+import { adminApi, type WarrantyRecord, type ContactSubmission } from '../admin/api';
 
 export const AdminDashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'warranty' | 'contact'>('warranty');
@@ -80,26 +47,24 @@ export const AdminDashboard: React.FC = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch warranties
-      const warrantyResult = await client.models.Warranty.list();
-      setWarrantyRecords((warrantyResult.data || []) as WarrantyRecord[]);
-
-      // Fetch contact submissions
-      const contactResult = await client.models.ContactSubmission.list();
-      setContactSubmissions((contactResult.data || []) as ContactSubmission[]);
+      const [warranties, contacts] = await Promise.all([
+        adminApi.listWarranties(),
+        adminApi.listContacts(),
+      ]);
+      setWarrantyRecords(warranties);
+      setContactSubmissions(contacts);
     } catch (error) {
       console.error('Error fetching data:', error);
+      setSuccessMessage(error instanceof Error ? error.message : 'Failed to load data');
+      setShowSuccessModal(true);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error('Sign-out failed:', error);
-    }
+  const handleLogout = () => {
+    // Ends the Cloudflare Access session; the app holds no session of its own.
+    window.location.href = '/cdn-cgi/access/logout';
   };
 
   const handleAddWarranty = () => {
@@ -137,7 +102,7 @@ export const AdminDashboard: React.FC = () => {
   const handleDeleteWarranty = async (id: string) => {
     if (window.confirm('Delete this warranty record permanently?')) {
       try {
-        await client.models.Warranty.delete({ id });
+        await adminApi.deleteWarranty(id);
         await fetchData();
         setSuccessMessage('Warranty deleted successfully!');
         setShowSuccessModal(true);
@@ -153,34 +118,30 @@ export const AdminDashboard: React.FC = () => {
     e.preventDefault();
     
     try {
-      const now = new Date().toISOString();
-      
       if (editingRecord) {
-        await client.models.Warranty.update({
-          id: editingRecord.id,
+        await adminApi.updateWarranty(editingRecord.id, {
           warrantyNumber: formData.warrantyNumber,
           productName: formData.productName,
-          manufactureDate: formData.manufactureDate || null,
+          manufactureDate: formData.manufactureDate,
           status: formData.status,
-          customerName: formData.customerName || null,
-          phone: formData.phone || null,
-          email: formData.email || null,
-          purchaseDate: formData.purchaseDate || null,
-          purchaseCountry: formData.purchaseCountry || null
+          customerName: formData.customerName,
+          phone: formData.phone,
+          email: formData.email,
+          purchaseDate: formData.purchaseDate,
+          purchaseCountry: formData.purchaseCountry,
         });
         setSuccessMessage('Warranty updated successfully!');
       } else {
-        await client.models.Warranty.create({
+        await adminApi.createWarranty({
           warrantyNumber: formData.warrantyNumber,
           productName: formData.productName,
-          manufactureDate: formData.manufactureDate || null,
+          manufactureDate: formData.manufactureDate,
           status: formData.status,
-          customerName: formData.customerName || null,
-          phone: formData.phone || null,
-          email: formData.email || null,
-          purchaseDate: formData.purchaseDate || null,
-          purchaseCountry: formData.purchaseCountry || null,
-          createdAt: now
+          customerName: formData.customerName,
+          phone: formData.phone,
+          email: formData.email,
+          purchaseDate: formData.purchaseDate,
+          purchaseCountry: formData.purchaseCountry,
         });
         setSuccessMessage('Warranty added successfully!');
       }
@@ -236,7 +197,7 @@ export const AdminDashboard: React.FC = () => {
 
   const markContactAsRead = async (id: string) => {
     try {
-      await client.models.ContactSubmission.update({ id, status: 'READ' });
+      await adminApi.setContactStatus(id, 'READ');
       await fetchData();
     } catch (error) {
       console.error('Error marking contact as read:', error);

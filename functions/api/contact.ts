@@ -1,11 +1,12 @@
 import { sendEmail } from '../lib/email';
+import { newId } from '../lib/db';
 
 /**
  * POST /api/contact - Cloudflare Pages Function.
  *
- * Replaces the AppSync + Lambda path. Enquiries go straight to email in this
- * stage; there is no database yet, so a send failure is reported to the caller
- * rather than hidden behind a success message.
+ * Replaces the AppSync + Lambda path. The enquiry is stored in D1 first and
+ * then emailed, so an email-provider outage never loses one - it still appears
+ * in the admin dashboard.
  *
  * Bindings (set as Pages environment secrets, never committed):
  *   TURNSTILE_SECRET   Cloudflare Turnstile secret key
@@ -15,6 +16,7 @@ import { sendEmail } from '../lib/email';
  *   CONTACT_FROM_EMAIL verified sender address
  */
 interface Env {
+  DB: D1Database;
   TURNSTILE_SECRET: string;
   EMAIL_API_KEY: string;
   EMAIL_PROVIDER?: string;
@@ -156,14 +158,36 @@ export const onRequestPost = async (context: {
     return json({ success: false, message: 'Verification failed. Please try again.' }, 403);
   }
 
+  // Persist first: a stored enquiry is recoverable, a dropped one is not.
+  try {
+    await env.DB.prepare(
+      `INSERT INTO contact_submissions (id, name, email, phone, region, interest, message, status, created_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 'PENDING', ?)`,
+    )
+      .bind(
+        newId(),
+        fields.name,
+        fields.email,
+        fields.phone || null,
+        fields.region,
+        fields.interest,
+        fields.message,
+        new Date().toISOString(),
+      )
+      .run();
+  } catch (error) {
+    console.error('Failed to store contact submission', error);
+    return json({ success: false, message: 'Could not save your message. Please try again.' }, 500);
+  }
+
   const recipients = (env.CONTACT_TO_EMAIL || '')
     .split(',')
     .map((address) => address.trim())
     .filter(Boolean);
 
   if (!recipients.length) {
-    console.error('CONTACT_TO_EMAIL is not configured.');
-    return json({ success: false, message: 'Contact form is not configured. Please email us directly.' }, 500);
+    console.warn('CONTACT_TO_EMAIL is not set - enquiry stored but not emailed.');
+    return json({ success: true, message: 'Thank you! Your message has been received.' }, 200);
   }
 
   try {
@@ -181,13 +205,9 @@ export const onRequestPost = async (context: {
       },
     );
   } catch (error) {
-    // No database in this stage, so a failed send means the enquiry is gone.
-    // Say so rather than reporting a success the user would rely on.
-    console.error('Contact email failed to send', error);
-    return json(
-      { success: false, message: 'We could not send your message. Please email us directly.' },
-      502,
-    );
+    // The enquiry is already stored and visible in the dashboard, so a send
+    // failure is logged rather than surfaced as a lost message.
+    console.error('Enquiry stored but email notification failed', error);
   }
 
   return json({ success: true, message: 'Thank you! Your message has been sent.' }, 200);

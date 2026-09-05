@@ -33,3 +33,6 @@ amplifyconfiguration*
 
 # Wrangler local dev state
 .wrangler
+
+# Local-only wrangler config
+wrangler.toml
