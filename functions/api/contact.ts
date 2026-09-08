@@ -9,7 +9,7 @@ import { newId } from '../lib/db';
  * in the admin dashboard.
  *
  * Bindings (set as Pages environment secrets, never committed):
- *   TURNSTILE_SECRET   Cloudflare Turnstile secret key
+ *   RECAPTCHA_SECRET   Google reCAPTCHA v2 secret key
  *   EMAIL_API_KEY      transactional provider API key
  *   EMAIL_PROVIDER     resend | sendgrid | brevo | mailersend  (default resend)
  *   CONTACT_TO_EMAIL   comma-separated recipient list
@@ -17,7 +17,7 @@ import { newId } from '../lib/db';
  */
 interface Env {
   DB: D1Database;
-  TURNSTILE_SECRET: string;
+  RECAPTCHA_SECRET: string;
   EMAIL_API_KEY: string;
   EMAIL_PROVIDER?: string;
   CONTACT_TO_EMAIL: string;
@@ -31,10 +31,10 @@ interface ContactPayload {
   region?: unknown;
   interest?: unknown;
   message?: unknown;
-  turnstileToken?: unknown;
+  recaptchaToken?: unknown;
 }
 
-const TURNSTILE_VERIFY_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+const RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
 
 /** Field length caps, so a malicious payload cannot produce a huge email. */
 const LIMITS: Record<string, number> = {
@@ -71,21 +71,21 @@ function readField(raw: unknown, field: string, required: boolean): string | nul
   return value;
 }
 
-async function verifyTurnstile(token: string, secret: string, ip: string | null): Promise<boolean> {
+async function verifyRecaptcha(token: string, secret: string, ip: string | null): Promise<boolean> {
   const form = new FormData();
   form.append('secret', secret);
   form.append('response', token);
   if (ip) form.append('remoteip', ip);
 
-  const response = await fetch(TURNSTILE_VERIFY_URL, { method: 'POST', body: form });
+  const response = await fetch(RECAPTCHA_VERIFY_URL, { method: 'POST', body: form });
   if (!response.ok) {
-    console.error('Turnstile verify HTTP error', response.status);
+    console.error('reCAPTCHA verify HTTP error', response.status);
     return false;
   }
 
   const result = (await response.json()) as { success?: boolean; 'error-codes'?: string[] };
   if (!result.success) {
-    console.warn('Turnstile rejected submission', result['error-codes']);
+    console.warn('reCAPTCHA rejected submission', result['error-codes']);
   }
   return result.success === true;
 }
@@ -148,12 +148,12 @@ export const onRequestPost = async (context: {
     return json({ success: false, message: 'Please enter a valid email address.' }, 400);
   }
 
-  const token = typeof payload.turnstileToken === 'string' ? payload.turnstileToken : '';
+  const token = typeof payload.recaptchaToken === 'string' ? payload.recaptchaToken : '';
   if (!token) {
     return json({ success: false, message: 'Please complete the verification challenge.' }, 400);
   }
 
-  const human = await verifyTurnstile(token, env.TURNSTILE_SECRET, request.headers.get('CF-Connecting-IP'));
+  const human = await verifyRecaptcha(token, env.RECAPTCHA_SECRET, request.headers.get('CF-Connecting-IP'));
   if (!human) {
     return json({ success: false, message: 'Verification failed. Please try again.' }, 403);
   }

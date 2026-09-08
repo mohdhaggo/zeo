@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Turnstile, type TurnstileHandle } from '../components/common/Turnstile';
+import { ReCaptcha, type ReCaptchaHandle } from '../components/common/ReCaptcha';
 
 // Public key. The paired secret lives only in the Pages Function environment,
 // which is what makes the token meaningful.
-const TURNSTILE_SITE_KEY = import.meta.env.VITE_TURNSTILE_SITE_KEY ?? '';
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? '';
 
 export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -16,8 +16,8 @@ export const ContactPage: React.FC = () => {
   });
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
-  const turnstileRef = useRef<TurnstileHandle>(null);
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const recaptchaRef = useRef<ReCaptchaHandle>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   useEffect(() => {
@@ -54,7 +54,7 @@ export const ContactPage: React.FC = () => {
       return;
     }
     
-    if (!turnstileToken) {
+    if (!recaptchaToken) {
       setMessage({ type: 'error', text: 'Please complete the verification challenge.' });
       return;
     }
@@ -65,7 +65,7 @@ export const ContactPage: React.FC = () => {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, turnstileToken }),
+        body: JSON.stringify({ ...formData, recaptchaToken }),
       });
 
       const result = (await response.json()) as { success: boolean; message: string };
@@ -82,8 +82,8 @@ export const ContactPage: React.FC = () => {
         interest: '', 
         message: '' 
       });
-      turnstileRef.current?.reset();
-      setTurnstileToken(null);
+      recaptchaRef.current?.reset();
+      setRecaptchaToken(null);
       setShowSuccessModal(true);
       
     } catch (error) {
@@ -328,16 +328,16 @@ export const ContactPage: React.FC = () => {
                   display: 'flex',
                   justifyContent: 'center'
                 }}>
-                  {TURNSTILE_SITE_KEY ? (
-                    <Turnstile
-                      ref={turnstileRef}
-                      siteKey={TURNSTILE_SITE_KEY}
-                      onVerify={setTurnstileToken}
-                      onExpire={() => setTurnstileToken(null)}
+                  {RECAPTCHA_SITE_KEY ? (
+                    <ReCaptcha
+                      ref={recaptchaRef}
+                      siteKey={RECAPTCHA_SITE_KEY}
+                      onVerify={setRecaptchaToken}
+                      onExpire={() => setRecaptchaToken(null)}
                     />
                   ) : (
                     <span style={{ color: '#e74c3c', fontSize: '0.85rem' }}>
-                      Verification is not configured. Set VITE_TURNSTILE_SITE_KEY.
+                      Verification is not configured. Set VITE_RECAPTCHA_SITE_KEY.
                     </span>
                   )}
                 </div>

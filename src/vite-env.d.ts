@@ -1,8 +1,8 @@
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  /** Cloudflare Turnstile site key. Set per environment in Cloudflare Pages. */
-  readonly VITE_TURNSTILE_SITE_KEY?: string;
+  /** Google reCAPTCHA v2 site key. Set per environment in Cloudflare Pages. */
+  readonly VITE_RECAPTCHA_SITE_KEY?: string;
 }
 
 interface ImportMeta {
