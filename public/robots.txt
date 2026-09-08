@@ -5,4 +5,4 @@ Allow: /
 Disallow: /admin-login
 Disallow: /dashboard
 
-Sitemap: https://zeoshields.com/sitemap.xml
+Sitemap: https://www.zeoshields.com/sitemap.xml

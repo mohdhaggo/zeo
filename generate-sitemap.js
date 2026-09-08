@@ -14,7 +14,7 @@ const routes = [
 ];
 
 // Update with your custom domain
-const BASE_URL = 'https://zeoshields.com';
+const BASE_URL = 'https://www.zeoshields.com';
 
 function generateSitemap() {
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>

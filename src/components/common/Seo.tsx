@@ -1,7 +1,7 @@
 import { useEffect, type FC } from 'react';
 
 export const SITE_NAME = 'Zeo Shields';
-export const BASE_URL = 'https://zeoshields.com';
+export const BASE_URL = 'https://www.zeoshields.com';
 const DEFAULT_IMAGE = '/zeo_landing.webp';
 
 export interface SeoProps {
