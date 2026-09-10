@@ -81,6 +81,38 @@ npx wrangler d1 execute zeoshields --remote --command "EXPLAIN QUERY PLAN SELECT
 
 **Status: not yet applied.**
 
+### 002-import-aws-warranties.sql
+
+Loads five warranty records recovered from AWS. The original move to D1 seeded from a sandbox table
+by mistake, so the live lookup held three test numbers while these sat only in DynamoDB. All of it is
+test data, and the one registered record is registered to the owner, but the live database should
+still match what the old site had.
+
+```bash
+npx wrangler d1 execute zeoshields --remote --file db/migrations/002-import-aws-warranties.sql
+```
+
+Two records are deliberately held back. `PPF-002-1013` exists twice in the source data, once as a
+TITAN PPF and once as an ULTRA PPF, and warranty numbers have to be unique. Decide which product owns
+that number and add it by hand.
+
+**Status: not yet applied.**
+
+## AWS
+
+Decommissioned on 10 September 2026. The Amplify app, both AppSync APIs, their four DynamoDB tables
+and the `zeoshields.com` domain association are deleted. Exports of every table are kept in
+`zeoshields-documents/aws-export/`.
+
+Two things remain in the account and are harmless: a Cognito user pool (`ap-southeast-1_KpgCf5P7L`)
+and its identity pool. The identity pool still allows anonymous sign-in, but the role it hands out
+has no policies attached, so those credentials can do nothing at all. Delete them if you want the
+account tidy.
+
+The AWS account also hosts Rodeo Drive CRM and two other applications, with their own Cognito pools
+and around 70 DynamoDB tables. Anything done in that account has to name Zeo Shields resources
+explicitly rather than tear down by service.
+
 ## Backups
 
 There is no automated backup. D1 Time Travel covers a limited window and nobody has confirmed the
