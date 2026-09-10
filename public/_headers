@@ -1,13 +1,61 @@
-# Ported from amplify.yml. Cloudflare Pages applies these to matching paths.
+# Cloudflare Pages applies these to matching paths.
+#
+# Note these cover static responses only. A response built by a Pages Function
+# does not pass through this file, so /api/* sets its own headers in code.
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
-
-/index.html
-  Cache-Control: public, max-age=0, must-revalidate
 
 /*
   X-Content-Type-Options: nosniff
   X-Frame-Options: SAMEORIGIN
   Referrer-Policy: strict-origin-when-cross-origin
   Strict-Transport-Security: max-age=31536000; includeSubDomains
+  # Nothing on this site uses a camera, microphone, location or payment API.
+  # Denying them means a compromised third-party script cannot ask either.
+  Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=(), interest-cohort=()
+  # Every host below is one the site genuinely loads from:
+  #   www.recaptcha.net, www.google.com, www.gstatic.com
+  #                                    reCAPTCHA. The script loads from
+  #                                    recaptcha.net, which Google publishes for
+  #                                    countries where google.com is blocked;
+  #                                    it still pulls assets from gstatic.
+  #   static.cloudflareinsights.com    the analytics beacon Cloudflare injects
+  #                                    at the edge, before </body>
+  #   www.googletagmanager.com         GA4, loaded only after cookie consent
+  #   fonts.googleapis.com/gstatic.com Google Fonts stylesheet and font files
+  #   cdnjs.cloudflare.com             Font Awesome stylesheet and its fonts
+  # style-src needs 'unsafe-inline' because the components style themselves with
+  # React style attributes throughout; removing it would mean rewriting every
+  # page. script-src deliberately does NOT have it - there are no inline
+  # scripts, so the useful half of the policy stays intact.
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.google.com https://www.recaptcha.net https://www.gstatic.com https://static.cloudflareinsights.com https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' data: https://fonts.gstatic.com https://cdnjs.cloudflare.com; img-src 'self' data: https://www.google-analytics.com https://www.googletagmanager.com; connect-src 'self' https://cloudflareinsights.com https://static.cloudflareinsights.com https://www.google-analytics.com https://region1.google-analytics.com; frame-src https://www.google.com https://www.recaptcha.net; media-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'self'; upgrade-insecure-requests
+
+# HTML must revalidate, or a visitor keeps yesterday's page after a deploy.
+# One rule per prerendered route, because Pages matches paths, not extensions.
+/
+  Cache-Control: public, max-age=0, must-revalidate
+/index.html
+  Cache-Control: public, max-age=0, must-revalidate
+/about
+  Cache-Control: public, max-age=0, must-revalidate
+/products
+  Cache-Control: public, max-age=0, must-revalidate
+/ppf-cat
+  Cache-Control: public, max-age=0, must-revalidate
+/titan-ppf
+  Cache-Control: public, max-age=0, must-revalidate
+/ultra-ppf
+  Cache-Control: public, max-age=0, must-revalidate
+/titan-satin-ppf
+  Cache-Control: public, max-age=0, must-revalidate
+/warranty
+  Cache-Control: public, max-age=0, must-revalidate
+/contact
+  Cache-Control: public, max-age=0, must-revalidate
+/privacy-policy
+  Cache-Control: public, max-age=0, must-revalidate
+/terms-conditions
+  Cache-Control: public, max-age=0, must-revalidate
+/refund-policy
+  Cache-Control: public, max-age=0, must-revalidate

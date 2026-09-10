@@ -6,7 +6,11 @@
 
 CREATE TABLE IF NOT EXISTS warranties (
   id                TEXT PRIMARY KEY,
-  warranty_number   TEXT NOT NULL UNIQUE,
+  -- COLLATE NOCASE is load-bearing. Every query compares this column with
+  -- COLLATE NOCASE, and SQLite will only use an index when the comparison
+  -- collation matches the index collation - so without this the index below
+  -- was never used and every lookup scanned the whole table.
+  warranty_number   TEXT NOT NULL UNIQUE COLLATE NOCASE,
   product_name      TEXT NOT NULL,
   manufacture_date  TEXT,
   status            TEXT NOT NULL DEFAULT 'UNREGISTERED',
@@ -20,7 +24,7 @@ CREATE TABLE IF NOT EXISTS warranties (
 );
 
 -- Public lookup is by warranty number, so index it rather than scanning.
-CREATE INDEX IF NOT EXISTS idx_warranties_number ON warranties (warranty_number);
+CREATE INDEX IF NOT EXISTS idx_warranties_number ON warranties (warranty_number COLLATE NOCASE);
 
 CREATE TABLE IF NOT EXISTS contact_submissions (
   id         TEXT PRIMARY KEY,

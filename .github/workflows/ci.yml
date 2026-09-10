@@ -1,0 +1,48 @@
+name: CI
+
+# Cloudflare Pages deploys straight from a branch push, so without this nothing
+# checks a commit before it is serving to the public.
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history, so the secret scan can look at every commit rather
+          # than just the tip.
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      # Typechecks src and functions, builds, and prerenders. The functions
+      # typecheck matters most: Cloudflare bundles that directory with esbuild,
+      # which strips types without checking them, so it is the one place a typo
+      # in an auth predicate would otherwise reach production silently.
+      - name: Build
+        run: npm run build
+
+      # Dev-only advisories do not reach visitors of a static build, so this
+      # gate is on what actually ships. Run `npm audit` locally for the rest.
+      - name: Audit production dependencies
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Scan for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

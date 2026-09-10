@@ -183,7 +183,7 @@ export const TitanSatinPPFPage: React.FC = () => {
               style={{ cursor: 'pointer' }}
             >
               {galleryImages.map((image, idx) => (
-                <img
+                <img loading="lazy" decoding="async"
                   key={idx}
                   src={image.src}
                   alt={image.alt}
@@ -368,7 +368,7 @@ export const TitanSatinPPFPage: React.FC = () => {
             <div className="flex-center">
               {visibleProducts.map((product) => (
                 <div key={product.id} className="fan-card" onClick={() => window.location.href = product.url}>
-                  <img src={product.image} alt={product.name} onError={(e) => { const target = e.target as HTMLImageElement; target.src = 'https://picsum.photos/id/104/300/300'; }} />
+                  <img loading="lazy" decoding="async" src={product.image} alt={product.name} onError={(e) => { const t = e.target as HTMLImageElement; t.onerror = null; t.src = '/image-unavailable.webp'; t.alt = 'Image unavailable'; }} />
                   <div className="fan-card-overlay">
                     <h4 style={{ fontSize: 'clamp(0.9rem, 3.5vw, 1.1rem)' }}>{product.name}</h4>
                     <p style={{ fontSize: 'clamp(0.7rem, 2.5vw, 0.75rem)' }}>{product.tag}</p>

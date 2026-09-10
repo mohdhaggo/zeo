@@ -19,6 +19,7 @@ export const ContactPage: React.FC = () => {
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const recaptchaRef = useRef<ReCaptchaHandle>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [captchaUnavailable, setCaptchaUnavailable] = useState(false);
 
   useEffect(() => {
     const fadeElements = document.querySelectorAll('.fade-section');
@@ -70,7 +71,13 @@ export const ContactPage: React.FC = () => {
 
       const result = (await response.json()) as { success: boolean; message: string };
       if (!result.success) {
-        throw new Error(result.message);
+        // The token is single use. Without a fresh challenge the visitor would
+        // re-post the spent one, Google would reject it, and every retry would
+        // fail identically until they reloaded and lost what they had typed.
+        recaptchaRef.current?.reset();
+        setRecaptchaToken(null);
+        setMessage({ type: 'error', text: result.message });
+        return;
       }
 
       // Reset form
@@ -87,9 +94,15 @@ export const ContactPage: React.FC = () => {
       setShowSuccessModal(true);
       
     } catch (error) {
+      // A network or JSON-parse failure also burns the token, so it needs the
+      // same fresh challenge as a rejected submission.
+      recaptchaRef.current?.reset();
+      setRecaptchaToken(null);
       console.error('Error submitting contact form:', error);
-      const detail = error instanceof Error ? error.message : 'Failed to send message. Please try again.';
-      setMessage({ type: 'error', text: detail });
+      setMessage({
+        type: 'error',
+        text: 'Could not reach the server. Please try again, or email info@zeoshields.com.',
+      });
     } finally {
       setLoading(false);
     }
@@ -319,7 +332,7 @@ export const ContactPage: React.FC = () => {
                 </div>
 
                 {/* Bot check. The token is only trusted after /api/contact
-                    verifies it with Cloudflare server-side. */}
+                    verifies it with Google server-side. */}
                 <div style={{
                   background: '#0F0F15',
                   padding: 'clamp(15px, 4vw, 20px)',
@@ -328,17 +341,26 @@ export const ContactPage: React.FC = () => {
                   display: 'flex',
                   justifyContent: 'center'
                 }}>
-                  {RECAPTCHA_SITE_KEY ? (
+                  {!RECAPTCHA_SITE_KEY || captchaUnavailable ? (
+                    // Says so out loud rather than showing an empty box. If the
+                    // script is blocked - an ad blocker, a proxy, or a country
+                    // where Google is unreachable - there is no challenge to
+                    // tick, so the visitor needs a route that still works.
+                                    <span style={{ color: '#FF8175', fontSize: '0.9rem', textAlign: 'center', lineHeight: 1.6 }}>
+                      Verification could not load, so this form cannot be submitted. Please email{' '}
+                      <a href="mailto:info@zeoshields.com" style={{ color: '#FF8175' }}>
+                        info@zeoshields.com
+                      </a>{' '}
+                      instead and we will reply the same way.
+                    </span>
+                  ) : (
                     <ReCaptcha
                       ref={recaptchaRef}
                       siteKey={RECAPTCHA_SITE_KEY}
                       onVerify={setRecaptchaToken}
                       onExpire={() => setRecaptchaToken(null)}
+                      onUnavailable={() => setCaptchaUnavailable(true)}
                     />
-                  ) : (
-                    <span style={{ color: '#e74c3c', fontSize: '0.85rem' }}>
-                      Verification is not configured. Set VITE_RECAPTCHA_SITE_KEY.
-                    </span>
                   )}
                 </div>
 
@@ -392,12 +414,10 @@ export const ContactPage: React.FC = () => {
               display: 'flex',
               flexDirection: 'column'
             }}>
-              <img 
+              <img loading="lazy" decoding="async" 
                 src="/contact.webp" 
                 alt="Zeo Shields Call Center Agent" 
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = 'https://placehold.co/400x380/1A1A22/E50914?text=Zeo+Shields+Agent';
-                }}
+                onError={(e) => { const t = e.target as HTMLImageElement; t.onerror = null; t.src = '/image-unavailable.webp'; t.alt = 'Image unavailable'; }}
                 style={{ 
                   width: '100%', 
                   height: 'clamp(250px, 40vw, 380px)', 

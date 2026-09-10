@@ -128,6 +128,8 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
           >
             {images.map((image, idx) => (
               <img
+                loading="lazy"
+                decoding="async"
                 key={idx}
                 src={image.src}
                 alt={image.alt}
@@ -253,7 +255,7 @@ export const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
               borderRadius: '1rem',
               border: '2px solid rgba(229,9,20,0.5)'
             }}
-          />
+          loading="lazy" decoding="async" />
           <div className="modal-caption" style={{
             position: 'absolute',
             bottom: '30px',

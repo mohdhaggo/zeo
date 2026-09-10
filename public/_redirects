@@ -1,1 +1,13 @@
-/*    /index.html    200
+# No SPA catch-all here any more.
+#
+# It used to be "/*  /index.html  200", which made every unmatched path return
+# HTTP 200 carrying the homepage HTML - a soft 404. Google treats those as
+# duplicate content and they are indexable, so a mistyped or spammed URL became
+# a crawlable page claiming to be the site.
+#
+# Each real route now has its own prerendered file in dist (see
+# scripts/prerender.mjs), which Cloudflare Pages serves directly. Anything with
+# no matching file falls through to dist/404.html, which Pages returns with a
+# real 404 status.
+#
+# Add genuine redirects below as "  /old-path  /new-path  301".

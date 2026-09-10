@@ -23,7 +23,7 @@ export const AboutContent: React.FC = () => {
           src="/zeo_landing.webp" 
           alt="Zeo Shields Installation"
           style={{ width: '100%', borderRadius: '32px', height: '400px', objectFit: 'cover' }}
-        />
+        loading="lazy" decoding="async" />
       </div>
     </div>
   );

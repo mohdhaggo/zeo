@@ -66,7 +66,7 @@ export const Hero: React.FC = () => {
           fontWeight: 600,
           borderLeft: '3px solid #E50914'
         }}>
-          <i className="fas fa-shield-haltered"></i> ENGINEERED FOR THE MIDDLE EAST, ASIA & BEYOND
+          <i className="fas fa-shield-halved"></i> ENGINEERED FOR THE MIDDLE EAST, ASIA & BEYOND
         </div>
         
         <div className="animated-word-container" style={{

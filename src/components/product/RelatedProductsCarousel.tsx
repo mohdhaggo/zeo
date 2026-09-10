@@ -65,7 +65,7 @@ export const RelatedProductsCarousel: React.FC<RelatedProductsCarouselProps> = (
                 opacity
               }}
             >
-              <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              <img src={product.image} alt={product.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} loading="lazy" decoding="async" />
               <div style={{
                 position: 'absolute',
                 bottom: 0,

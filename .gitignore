@@ -36,3 +36,16 @@ amplifyconfiguration*
 
 # Local-only wrangler config
 wrangler.toml
+
+# Secrets. The .dev.vars rule above only covers that exact filename, so these
+# patterns catch the file that does not exist yet. This repo is public, so a
+# single "git add ." that swept up a .env would be world-readable and scraped
+# by automated secret crawlers within minutes.
+.env
+.env.*
+!.env.example
+.dev.vars.*
+!.dev.vars.example
+*.pem
+*.key
+secrets.json

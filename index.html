@@ -2,30 +2,70 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/webp" href="/zeo_logo.webp" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#010101" />
 
-    <!-- Fallback metadata. Each route overrides these via the Seo component. -->
-    <title>Zeo Shields | Premium Paint Protection Film, Window Tint & Windshield Film</title>
+    <!-- Square PNG icons. The old single WebP icon was 530x476, and Google's
+         search-result favicon needs a square icon in a format it supports,
+         which WebP is not - so results showed a generic globe. -->
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Fonts and icons load here rather than through @import in index.css.
+         An @import inside a stylesheet cannot start downloading until that
+         stylesheet has arrived and been parsed, which put three round trips in
+         series before the first paint. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Orbitron:wght@500;600;700;900&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+      integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+
+    <!--seo-start-->
+    <title>Zeo Shields | Premium Paint Protection Film, Window Tint &amp; Windshield Film</title>
     <meta
       name="description"
       content="Premium automotive protection films engineered for extreme climates. PPF, window tint and windshield film for the Middle East, Asia and global markets."
     />
     <meta name="robots" content="index, follow" />
-
+    <link rel="canonical" href="https://www.zeoshields.com/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Zeo Shields" />
-    <meta property="og:title" content="Zeo Shields | Premium Automotive Protection Films" />
+    <meta
+      property="og:title"
+      content="Zeo Shields | Premium Paint Protection Film, Window Tint &amp; Windshield Film"
+    />
     <meta
       property="og:description"
-      content="PPF, window tint and windshield film engineered for extreme climates, high-speed roads and global performance standards."
+      content="Premium automotive protection films engineered for extreme climates. PPF, window tint and windshield film for the Middle East, Asia and global markets."
     />
-    <meta property="og:image" content="https://www.zeoshields.com/zeo_landing.webp" />
+    <meta property="og:url" content="https://www.zeoshields.com/" />
+    <meta property="og:image" content="https://www.zeoshields.com/og-default.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Zeo Shields premium automotive protection film" />
     <meta name="twitter:card" content="summary_large_image" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <meta
+      name="twitter:title"
+      content="Zeo Shields | Premium Paint Protection Film, Window Tint &amp; Windshield Film"
+    />
+    <meta
+      name="twitter:description"
+      content="Premium automotive protection films engineered for extreme climates. PPF, window tint and windshield film for the Middle East, Asia and global markets."
+    />
+    <meta name="twitter:image" content="https://www.zeoshields.com/og-default.jpg" />
+    <!--seo-end-->
   </head>
   <body>
     <div id="root"></div>

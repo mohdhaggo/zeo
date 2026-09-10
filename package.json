@@ -1,40 +1,40 @@
 {
-  "name": "amplify-vite-react-template",
+  "name": "zeoshields-website",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node generate-sitemap.js && tsc && vite build",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+    "build": "node scripts/generate-sitemap.mjs && tsc && tsc -p tsconfig.functions.json && vite build && node scripts/prerender.mjs",
+    "lint": "eslint . --ext ts,tsx,mjs --report-unused-disable-directives",
     "preview": "vite preview",
-    "dev:pages": "npm run build && wrangler pages dev dist --port 4175"
+    "dev:pages": "npm run build && wrangler pages dev dist --port 4175",
+    "assets": "node scripts/generate-assets.mjs",
+    "typecheck:functions": "tsc -p tsconfig.functions.json"
   },
   "dependencies": {
     "react": "~18.3.1",
     "react-dom": "~18.3.1",
-    "react-router-dom": "^7.15.1"
+    "react-router-dom": "^7.18.3"
   },
   "engines": {
     "node": ">= 20.20.0",
     "npm": ">= 10.8.0"
   },
   "devDependencies": {
+    "@cloudflare/workers-types": "^5.20260910.1",
     "@eslint/compat": "~2.0.1",
     "@eslint/eslintrc": "~3.3.3",
     "@eslint/js": "~9.39.2",
-    "@types/node": "^26.4.1",
     "@types/react": "~18.3.27",
     "@types/react-dom": "~18.3.7",
     "@typescript-eslint/eslint-plugin": "~8.53.0",
     "@typescript-eslint/parser": "~8.53.0",
     "@vitejs/plugin-react": "~5.1.2",
-    "esbuild": "~0.27.2",
     "eslint": "~9.39.2",
     "eslint-plugin-react-hooks": "~7.0.1",
     "eslint-plugin-react-refresh": "~0.4.26",
     "globals": "~17.0.0",
-    "tsx": "^4.7.0",
     "typescript": "~5.9.3",
     "vite": "~7.3.1",
     "wrangler": "^4.129.0"

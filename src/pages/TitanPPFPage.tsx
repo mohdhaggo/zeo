@@ -451,10 +451,7 @@ export const TitanPPFPage: React.FC = () => {
                   <img 
                     src={product.image} 
                     alt={product.name} 
-                    onError={(e) => { 
-                      const target = e.target as HTMLImageElement; 
-                      target.src = 'https://picsum.photos/id/104/300/300'; 
-                    }} 
+                    onError={(e) => { const t = e.target as HTMLImageElement; t.onerror = null; t.src = '/image-unavailable.webp'; t.alt = 'Image unavailable'; }} 
                     loading="lazy"
                   />
                   <div className="fan-card-overlay">

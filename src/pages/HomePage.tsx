@@ -83,7 +83,7 @@ export const HomePage: React.FC = () => {
   const products = [
     {
       name: 'TITAN PPF',
-      desc: 'Maximum protection PPF with 10-year durability.',
+      desc: 'Maximum impact protection, backed by a 5 year warranty.',
       img: '/01-titan-ppf-blue.webp',
       url: '/titan-ppf',
       badge: '5 YEAR WARRANTY',
@@ -111,7 +111,23 @@ export const HomePage: React.FC = () => {
     <>
         <div className="video-section fade-section">
           <div className="video-wrapper">
-            <video autoPlay loop muted playsInline>
+            {/* poster paints immediately while the clip downloads, so the top
+                of the page is never an empty black box. The clip itself was
+                1.82 MB of 1080p at 5.2 Mbps carrying an audio track it never
+                plays, because it is muted - it is now 200 kB at 720p with the
+                audio stripped. aria-hidden because it is decoration: it
+                communicates nothing a screen-reader user needs, and it has no
+                captions. */}
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              aria-hidden="true"
+              poster="/white_car_PPF_poster.jpg"
+              width={1280}
+              height={720}
+            >
               <source src="/white_car_PPF.mp4" type="video/mp4" />
             </video>
           </div>
@@ -124,7 +140,7 @@ export const HomePage: React.FC = () => {
         <div className="hero-bg"></div>
         <div className="container">
           <div className="hero-badge">
-            <i className="fas fa-shield-haltered"></i> ENGINEERED FOR THE MIDDLE EAST, ASIA & BEYOND
+            <i className="fas fa-shield-halved"></i> ENGINEERED FOR THE MIDDLE EAST, ASIA & BEYOND
           </div>
           <h1 className="animated-word-container">
             <span className="static-prefix">Ultimate</span>
@@ -168,7 +184,7 @@ export const HomePage: React.FC = () => {
           {products.map((product, idx) => (
             <div key={idx} className="product-card" onClick={() => window.location.href = product.url}>
               <div className="product-img">
-                <img src={product.img} alt={product.name} />
+                <img src={product.img} alt={product.name} loading="lazy" decoding="async" />
                 <div className="product-badge" style={{ background: product.badge === 'SATIN FINISH' ? '#8A8A8A' : '#E50914' }}>{product.badge}</div>
               </div>
               <div className="product-content">

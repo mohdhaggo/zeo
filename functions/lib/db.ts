@@ -19,8 +19,20 @@ export interface WarrantyRow {
   created_at: string;
 }
 
+/**
+ * The columns the public lookup is allowed to read.
+ *
+ * Typed as its own thing so the query and the projection agree: a caller that
+ * has not selected the PII columns cannot accidentally be handed a function
+ * that returns them.
+ */
+export type PublicWarrantyRow = Pick<
+  WarrantyRow,
+  'warranty_number' | 'product_name' | 'manufacture_date' | 'status' | 'registration_date'
+>;
+
 /** Public-safe projection: never includes customer name, phone or email. */
-export function warrantyToPublicJson(row: WarrantyRow) {
+export function warrantyToPublicJson(row: PublicWarrantyRow) {
   return {
     found: true,
     warrantyNumber: row.warranty_number,
@@ -32,10 +44,23 @@ export function warrantyToPublicJson(row: WarrantyRow) {
   };
 }
 
+/**
+ * The JSON response every public endpoint returns.
+ *
+ * Headers live here rather than at each call site. The warranty lookup used to
+ * return a bare response, so a browser or an intermediary was free to cache
+ * {"eligibleForRegistration": true} heuristically - and then keep showing the
+ * pre-registration answer to a customer who had already registered, or serve
+ * one visitor's lookup to the next on a shared machine.
+ */
 export function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Content-Type-Options': 'nosniff',
+      'Cache-Control': 'no-store',
+    },
   });
 }
 

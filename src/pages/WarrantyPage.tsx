@@ -1,4 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ReCaptcha, type ReCaptchaHandle } from '../components/common/ReCaptcha';
+
+// Public key. The paired secret lives only in the Pages Function environment,
+// which is what makes the token meaningful.
+const RECAPTCHA_SITE_KEY = import.meta.env.VITE_RECAPTCHA_SITE_KEY ?? '';
 
 interface WarrantyData {
   warrantyNumber: string;
@@ -24,6 +29,9 @@ export const WarrantyPage: React.FC = () => {
     country: '',
     purchaseDate: ''
   });
+  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+  const [captchaUnavailable, setCaptchaUnavailable] = useState(false);
+  const recaptchaRef = useRef<ReCaptchaHandle>(null);
 
   useEffect(() => {
     const fadeElements = document.querySelectorAll('.fade-section');
@@ -109,6 +117,11 @@ export const WarrantyPage: React.FC = () => {
       return;
     }
 
+    if (!recaptchaToken) {
+      setMessage({ text: 'Please complete the verification challenge.', type: 'error' });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -123,14 +136,21 @@ export const WarrantyPage: React.FC = () => {
           email,
           phone: mobile,
           purchaseCountry: country,
-          purchaseDate: purchaseDate || new Date().toISOString().split('T')[0],
+          // Sent only when the customer actually gave one. This used to fall back
+          // to today's date, which silently recorded a false purchase date on
+          // the record a warranty claim is later judged against.
+          purchaseDate: purchaseDate || '',
+          recaptchaToken,
         }),
       });
 
       const data = (await response.json()) as { success: boolean; message?: string };
 
       if (!data.success) {
-        setMessage({ text: '❌ ' + (data.message || 'Registration failed.'), type: 'error' });
+        // The token is single-use, so a rejected submission needs a fresh one.
+        recaptchaRef.current?.reset();
+        setRecaptchaToken(null);
+        setMessage({ text: data.message || 'Registration failed.', type: 'error' });
         return;
       }
 
@@ -152,6 +172,8 @@ export const WarrantyPage: React.FC = () => {
     setMessage(null);
     setWarrantyDetails(null);
     setRegFormData({ fullName: '', mobile: '', email: '', country: '', purchaseDate: '' });
+    recaptchaRef.current?.reset();
+    setRecaptchaToken(null);
   };
 
   const formatDateOnly = (dateString: string | undefined) => {
@@ -170,11 +192,16 @@ export const WarrantyPage: React.FC = () => {
       setMessage({ text: 'Please validate a warranty first.', type: 'error' });
       return;
     }
-    if (warrantyDetails.status === 'ACTIVE') {
+    // The same predicate the server uses. Testing status === 'ACTIVE' here
+    // meant any other value - a legacy import, a manual edit, wrong casing -
+    // opened a form the server would then refuse, telling the customer their
+    // warranty was both claimable and already claimed.
+    if (!warrantyDetails.eligibleForRegistration) {
       setMessage({ text: 'This warranty is already registered.', type: 'error' });
       return;
     }
     setRegFormData({ fullName: '', mobile: '', email: '', country: '', purchaseDate: '' });
+    setRecaptchaToken(null);
     setShowModal(true);
   };
 
@@ -228,7 +255,11 @@ export const WarrantyPage: React.FC = () => {
         <p style={{ color: '#aaa', marginBottom: '28px', fontSize: '0.95rem' }}>Please enter the Warranty ID provided with your product purchase.</p>
         
         <div style={{ display: 'flex', gap: '12px', marginBottom: '20px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          <label htmlFor="warranty-number" className="visually-hidden">
+            Warranty number
+          </label>
           <input
+            id="warranty-number"
             type="text"
             value={warrantyId}
             onChange={(e) => setWarrantyId(e.target.value)}
@@ -419,12 +450,14 @@ export const WarrantyPage: React.FC = () => {
             </h3>
             
             <div style={{ marginBottom: '6px' }}>
-              <label style={{ display: 'block', fontSize: '0.7rem', color: '#aaa', marginLeft: '12px', marginBottom: '4px', textAlign: 'left' }}>
+              <label htmlFor="reg-full-name" style={{ display: 'block', fontSize: '0.7rem', color: '#aaa', marginLeft: '12px', marginBottom: '4px', textAlign: 'left' }}>
                 <i className="fas fa-user"></i> Full Name (Registered To) *
               </label>
               <input
                 type="text"
+                id="reg-full-name"
                 name="fullName"
+                required
                 value={regFormData.fullName}
                 onChange={handleRegChange}
                 placeholder="Enter your full name"
@@ -434,12 +467,14 @@ export const WarrantyPage: React.FC = () => {
             </div>
             
             <div style={{ marginBottom: '6px' }}>
-              <label style={{ display: 'block', fontSize: '0.7rem', color: '#aaa', marginLeft: '12px', marginBottom: '4px', textAlign: 'left' }}>
+              <label htmlFor="reg-mobile" style={{ display: 'block', fontSize: '0.7rem', color: '#aaa', marginLeft: '12px', marginBottom: '4px', textAlign: 'left' }}>
                 <i className="fas fa-phone-alt"></i> Mobile Number *
               </label>
               <input
                 type="tel"
+                id="reg-mobile"
                 name="mobile"
+                required
                 value={regFormData.mobile}
                 onChange={handleRegChange}
                 placeholder="+1234567890"
@@ -449,12 +484,14 @@ export const WarrantyPage: React.FC = () => {
             </div>
             
             <div style={{ marginBottom: '6px' }}>
-              <label style={{ display: 'block', fontSize: '0.7rem', color: '#aaa', marginLeft: '12px', marginBottom: '4px', textAlign: 'left' }}>
+              <label htmlFor="reg-email" style={{ display: 'block', fontSize: '0.7rem', color: '#aaa', marginLeft: '12px', marginBottom: '4px', textAlign: 'left' }}>
                 <i className="fas fa-envelope"></i> Email ID *
               </label>
               <input
                 type="email"
+                id="reg-email"
                 name="email"
+                required
                 value={regFormData.email}
                 onChange={handleRegChange}
                 placeholder="your@email.com"
@@ -464,11 +501,13 @@ export const WarrantyPage: React.FC = () => {
             </div>
             
             <div style={{ marginBottom: '6px' }}>
-              <label style={{ display: 'block', fontSize: '0.7rem', color: '#aaa', marginLeft: '12px', marginBottom: '4px', textAlign: 'left' }}>
+              <label htmlFor="reg-country" style={{ display: 'block', fontSize: '0.7rem', color: '#aaa', marginLeft: '12px', marginBottom: '4px', textAlign: 'left' }}>
                 <i className="fas fa-globe-americas"></i> Country of Purchase *
               </label>
               <select
+                id="reg-country"
                 name="country"
+                required
                 value={regFormData.country}
                 onChange={handleRegChange}
                 style={{ width: '100%', padding: '14px 18px', background: '#1A1A22', border: '1px solid #333', borderRadius: '40px', color: 'white', fontSize: '1rem', outline: 'none', transition: '0.2s', boxSizing: 'border-box' }}
@@ -485,11 +524,12 @@ export const WarrantyPage: React.FC = () => {
             </div>
             
             <div style={{ marginBottom: '6px' }}>
-              <label style={{ display: 'block', fontSize: '0.7rem', color: '#aaa', marginLeft: '12px', marginBottom: '4px', textAlign: 'left' }}>
+              <label htmlFor="reg-purchase-date" style={{ display: 'block', fontSize: '0.7rem', color: '#aaa', marginLeft: '12px', marginBottom: '4px', textAlign: 'left' }}>
                 <i className="fas fa-calendar-alt"></i> Purchase Date
               </label>
               <input
                 type="date"
+                id="reg-purchase-date"
                 name="purchaseDate"
                 value={regFormData.purchaseDate}
                 onChange={handleRegChange}
@@ -497,6 +537,39 @@ export const WarrantyPage: React.FC = () => {
               />
             </div>
             
+            {/* Registration permanently binds this warranty to a person, so it
+                gets the same anti-automation check as the contact form. Without
+                it the endpoint could be scripted to claim every unregistered
+                warranty in the database. */}
+            <div
+              style={{
+                marginTop: '18px',
+                display: 'flex',
+                justifyContent: 'center',
+                // The widget is a fixed 304px and the modal is narrower than
+                // that on a small phone, so it is scaled to fit rather than
+                // pushing the dialog into horizontal scroll.
+                transform: 'scale(0.88)',
+                transformOrigin: 'center',
+              }}
+            >
+              {!RECAPTCHA_SITE_KEY || captchaUnavailable ? (
+                <p style={{ color: '#FF8175', fontSize: '0.85rem', textAlign: 'center', lineHeight: 1.6 }}>
+                  Verification could not load, so registration cannot be completed here. Please
+                  email <a href="mailto:info@zeoshields.com" style={{ color: '#FF8175' }}>info@zeoshields.com</a>{' '}
+                  with your warranty number and we will register it for you.
+                </p>
+              ) : (
+                <ReCaptcha
+                  ref={recaptchaRef}
+                  siteKey={RECAPTCHA_SITE_KEY}
+                  onVerify={setRecaptchaToken}
+                  onExpire={() => setRecaptchaToken(null)}
+                  onUnavailable={() => setCaptchaUnavailable(true)}
+                />
+              )}
+            </div>
+
             <div style={{ display: 'flex', gap: '14px', marginTop: '24px' }}>
               <button onClick={registerWarranty} disabled={loading} style={{
                 flex: 1,

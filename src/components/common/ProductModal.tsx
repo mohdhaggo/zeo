@@ -57,7 +57,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({ isOpen, product, onC
           alt={product.name}
           className="modal-image" 
           style={{ width: '100%', borderRadius: '24px', marginBottom: '20px' }}
-        />
+        loading="lazy" decoding="async" />
         <p>
           <strong>{product.shortDesc}</strong>
           <br /><br />

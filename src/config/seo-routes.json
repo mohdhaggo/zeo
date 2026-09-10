@@ -1,0 +1,108 @@
+{
+  "baseUrl": "https://www.zeoshields.com",
+  "siteName": "Zeo Shields",
+  "defaultImage": "/og-default.jpg",
+  "routes": [
+    {
+      "path": "/",
+      "title": "Zeo Shields | Premium Paint Protection Film, Window Tint & Windshield Film",
+      "description": "Premium automotive protection films engineered for extreme climates. PPF, window tint and windshield film for the Middle East, Asia and global markets.",
+      "priority": "1.0",
+      "changefreq": "monthly",
+      "lastmod": "2026-09-10"
+    },
+    {
+      "path": "/about",
+      "title": "About Us",
+      "description": "Zeo Shields delivers advanced Paint Protection Film, window tint and windshield protection built for performance, durability and extreme climates.",
+      "priority": "0.8",
+      "changefreq": "yearly",
+      "lastmod": "2026-09-10"
+    },
+    {
+      "path": "/products",
+      "title": "Products",
+      "description": "Explore the Zeo Shields range: Paint Protection Film, window tint and windshield protection film for cars, fleets and enthusiasts.",
+      "priority": "0.8",
+      "changefreq": "monthly",
+      "lastmod": "2026-09-10"
+    },
+    {
+      "path": "/ppf-cat",
+      "title": "Paint Protection Film (PPF)",
+      "description": "Zeo Shields Paint Protection Film with self-healing top coat, UV and heat resistance, and up to a 10 year warranty. Engineered for extreme conditions.",
+      "image": "/og-ppf.jpg",
+      "priority": "0.7",
+      "changefreq": "monthly",
+      "lastmod": "2026-09-10"
+    },
+    {
+      "path": "/titan-ppf",
+      "title": "TITAN PPF - Maximum Protection Paint Protection Film",
+      "description": "TITAN PPF delivers maximum impact protection with a self-healing top coat and a 5 year warranty. Built for high-speed roads and harsh climates.",
+      "image": "/og-titan.jpg",
+      "priority": "0.7",
+      "changefreq": "monthly",
+      "lastmod": "2026-09-10"
+    },
+    {
+      "path": "/ultra-ppf",
+      "title": "ULTRA PPF - Advanced Paint Protection Film",
+      "description": "ULTRA PPF combines advanced nano-coating technology with reliable long-term protection and an 8 year warranty.",
+      "image": "/og-ultra.jpg",
+      "priority": "0.7",
+      "changefreq": "monthly",
+      "lastmod": "2026-09-10"
+    },
+    {
+      "path": "/titan-satin-ppf",
+      "title": "PRIME PPF - Premium Satin Finish Paint Protection Film",
+      "description": "PRIME PPF pairs a premium satin finish with ultimate paint protection and a 10 year warranty.",
+      "image": "/og-prime.jpg",
+      "priority": "0.7",
+      "changefreq": "monthly",
+      "lastmod": "2026-09-10"
+    },
+    {
+      "path": "/warranty",
+      "title": "Warranty Policy & Validation",
+      "description": "Validate and register your Zeo Shields warranty. Check coverage, registration status and warranty terms for your protection film.",
+      "priority": "0.9",
+      "changefreq": "monthly",
+      "lastmod": "2026-09-10"
+    },
+    {
+      "path": "/contact",
+      "title": "Contact Distributors",
+      "description": "Talk to the Zeo Shields team about distribution, pricing and technical support across the Middle East, Asia and worldwide.",
+      "image": "/og-contact.jpg",
+      "priority": "0.8",
+      "changefreq": "yearly",
+      "lastmod": "2026-09-10"
+    },
+    {
+      "path": "/privacy-policy",
+      "title": "Privacy Policy",
+      "description": "How Zeo Shields collects, uses, stores and shares personal information, who else sees it, how long we keep it and the rights you have over it.",
+      "priority": "0.3",
+      "changefreq": "yearly",
+      "lastmod": "2026-09-10"
+    },
+    {
+      "path": "/terms-conditions",
+      "title": "Terms & Conditions",
+      "description": "The terms on which Zeo Shields makes this website, its warranty service and its paint protection film products available to you.",
+      "priority": "0.3",
+      "changefreq": "yearly",
+      "lastmod": "2026-09-10"
+    },
+    {
+      "path": "/refund-policy",
+      "title": "Refund & Returns Policy",
+      "description": "When Zeo Shields will refund or replace a product, what cannot be returned, how to make a request and how long a refund takes.",
+      "priority": "0.3",
+      "changefreq": "yearly",
+      "lastmod": "2026-09-10"
+    }
+  ]
+}

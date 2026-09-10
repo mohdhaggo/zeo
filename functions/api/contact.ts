@@ -1,12 +1,14 @@
 import { sendEmail } from '../lib/email';
-import { newId } from '../lib/db';
+import { json, newId } from '../lib/db';
+import { verifyRecaptcha } from '../lib/recaptcha';
+import { stripControlChars, stripControlCharsKeepNewlines } from '../lib/sanitize';
+import { isRateLimited, tooManyRequests } from '../lib/ratelimit';
 
 /**
  * POST /api/contact - Cloudflare Pages Function.
  *
- * Replaces the AppSync + Lambda path. The enquiry is stored in D1 first and
- * then emailed, so an email-provider outage never loses one - it still appears
- * in the admin dashboard.
+ * The enquiry is stored in D1 first and then emailed, so an email-provider
+ * outage never loses one - it still appears in the admin dashboard.
  *
  * Bindings (set as Pages environment secrets, never committed):
  *   RECAPTCHA_SECRET   Google reCAPTCHA v2 secret key
@@ -34,7 +36,11 @@ interface ContactPayload {
   recaptchaToken?: unknown;
 }
 
-const RECAPTCHA_VERIFY_URL = 'https://www.google.com/recaptcha/api/siteverify';
+/**
+ * reCAPTCHA makes each submission expensive to forge, but not slow to retry.
+ * This caps how many any one address can send.
+ */
+const SUBMIT_LIMIT = { limit: 5, windowSeconds: 600 };
 
 /** Field length caps, so a malicious payload cannot produce a huge email. */
 const LIMITS: Record<string, number> = {
@@ -46,12 +52,32 @@ const LIMITS: Record<string, number> = {
   message: 5000,
 };
 
-function json(body: unknown, status: number): Response {
-  return new Response(JSON.stringify(body), {
-    status,
-    headers: { 'Content-Type': 'application/json' },
-  });
-}
+/**
+ * The dropdowns on the contact form, repeated here.
+ *
+ * The browser can only pick from these lists, but the browser is not what
+ * posts to this endpoint - curl is. Without a server-side check these two
+ * fields were free text, which is how a "region" ends up carrying a spam URL
+ * that then lands in the notification email and the dashboard.
+ */
+const REGIONS = new Set([
+  'Saudi Arabia',
+  'UAE',
+  'Qatar',
+  'Kuwait',
+  'Bahrain',
+  'Oman',
+  'Other',
+]);
+
+const INTERESTS = new Set([
+  'ULTRA PPF',
+  'TITAN PPF',
+  'TITAN SATIN PPF',
+  'Window Tint',
+  'Windshield Film',
+  'Other',
+]);
 
 function escapeHtml(value: string): string {
   return value
@@ -62,32 +88,17 @@ function escapeHtml(value: string): string {
     .replace(/'/g, '&#39;');
 }
 
-/** Returns the trimmed string if present and within its cap, else null. */
+/** Returns the cleaned string if present and within its cap, else null. */
 function readField(raw: unknown, field: string, required: boolean): string | null {
   if (typeof raw !== 'string') return required ? null : '';
-  const value = raw.trim();
+  // Newlines are meaningful in the message and nowhere else. Everywhere else
+  // they are stripped before the length check, so a padded payload cannot slip
+  // past the cap and a name cannot carry a line break into the email subject.
+  const value =
+    field === 'message' ? stripControlCharsKeepNewlines(raw) : stripControlChars(raw);
   if (!value) return required ? null : '';
   if (value.length > LIMITS[field]) return null;
   return value;
-}
-
-async function verifyRecaptcha(token: string, secret: string, ip: string | null): Promise<boolean> {
-  const form = new FormData();
-  form.append('secret', secret);
-  form.append('response', token);
-  if (ip) form.append('remoteip', ip);
-
-  const response = await fetch(RECAPTCHA_VERIFY_URL, { method: 'POST', body: form });
-  if (!response.ok) {
-    console.error('reCAPTCHA verify HTTP error', response.status);
-    return false;
-  }
-
-  const result = (await response.json()) as { success?: boolean; 'error-codes'?: string[] };
-  if (!result.success) {
-    console.warn('reCAPTCHA rejected submission', result['error-codes']);
-  }
-  return result.success === true;
 }
 
 function buildEmailBody(fields: Record<string, string>): string {
@@ -121,6 +132,10 @@ export const onRequestPost = async (context: {
 }): Promise<Response> => {
   const { request, env } = context;
 
+  if (await isRateLimited(request, 'contact', SUBMIT_LIMIT)) {
+    return tooManyRequests(SUBMIT_LIMIT.windowSeconds);
+  }
+
   let payload: ContactPayload;
   try {
     payload = (await request.json()) as ContactPayload;
@@ -132,7 +147,9 @@ export const onRequestPost = async (context: {
   for (const [field, required] of Object.entries({
     name: true,
     email: true,
-    phone: false,
+    // The form marks this required and refuses to submit without it, so the
+    // server agrees rather than silently accepting an enquiry with no number.
+    phone: true,
     region: true,
     interest: true,
     message: true,
@@ -148,12 +165,26 @@ export const onRequestPost = async (context: {
     return json({ success: false, message: 'Please enter a valid email address.' }, 400);
   }
 
+  if (!REGIONS.has(fields.region)) {
+    return json({ success: false, message: 'Please choose a region from the list.' }, 400);
+  }
+
+  if (!INTERESTS.has(fields.interest)) {
+    return json({ success: false, message: 'Please choose a product from the list.' }, 400);
+  }
+
   const token = typeof payload.recaptchaToken === 'string' ? payload.recaptchaToken : '';
   if (!token) {
     return json({ success: false, message: 'Please complete the verification challenge.' }, 400);
   }
 
-  const human = await verifyRecaptcha(token, env.RECAPTCHA_SECRET, request.headers.get('CF-Connecting-IP'));
+  // Validation runs first so a rejected field does not burn the single-use
+  // token and force the visitor to solve the challenge again.
+  const human = await verifyRecaptcha(
+    token,
+    env.RECAPTCHA_SECRET,
+    request.headers.get('CF-Connecting-IP'),
+  );
   if (!human) {
     return json({ success: false, message: 'Verification failed. Please try again.' }, 403);
   }
