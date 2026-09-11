@@ -46,7 +46,6 @@ const RefundPolicyPage = lazy(() =>
 import { Navbar } from './components/common/Navbar';
 import { Footer } from './components/common/Footer';
 import { Seo } from './components/common/Seo';
-import { StructuredData } from './components/common/StructuredData';
 import { CookieConsent } from './components/common/CookieConsent';
 import { loadConsentedAnalytics, trackPageView } from './lib/analytics';
 import seoRoutes from './config/seo-routes.json';
@@ -113,7 +112,6 @@ const PageFallback = () => (
 function App() {
   return (
     <BrowserRouter>
-      <StructuredData />
       <Analytics />
       <Suspense fallback={<PageFallback />}>
       <Routes>

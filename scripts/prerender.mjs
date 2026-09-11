@@ -39,6 +39,62 @@ function attr(value) {
     .replace(/"/g, '&quot;');
 }
 
+/**
+ * Organization markup, emitted into the HTML rather than written by a script.
+ *
+ * This is what tells Google that "Zeo Shields" is a thing rather than two words
+ * that happen to appear on a page - the entity a knowledge panel is built from,
+ * and the record against which Google eventually learns that people typing
+ * "zeosheilds" mean this company. It used to be added by a useEffect, so it
+ * only existed after JavaScript ran and was absent from the first crawl.
+ *
+ * alternateName lists real ways the brand is written, not deliberate typos.
+ * Google corrects misspelled queries from what searchers do, not from markup,
+ * so a list of misspellings here would be decoration at best and look
+ * manipulative at worst. The fix for typos is owning the typo domains.
+ */
+function organizationSchema() {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': baseUrl + '/#organization',
+    name: siteName,
+    alternateName: ['ZeoShields', 'Zeo Shield', 'Zeo Shields PPF'],
+    url: baseUrl + '/',
+    logo: {
+      '@type': 'ImageObject',
+      url: baseUrl + '/android-chrome-512x512.png',
+      width: 512,
+      height: 512,
+    },
+    image: baseUrl + defaultImage,
+    description:
+      'Premium automotive protection films. Paint Protection Film (PPF), window tint and windshield film engineered for extreme climates.',
+    email: 'info@zeoshields.com',
+    areaServed: ['Middle East', 'Asia', 'Worldwide'],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      contactType: 'sales',
+      email: 'info@zeoshields.com',
+      areaServed: ['Middle East', 'Asia', 'Worldwide'],
+      availableLanguage: ['English'],
+    },
+  });
+}
+
+/** Ties the domain to the brand name, which is what sitelinks are built on. */
+function websiteSchema() {
+  return JSON.stringify({
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': baseUrl + '/#website',
+    name: siteName,
+    alternateName: 'ZeoShields',
+    url: baseUrl + '/',
+    publisher: { '@id': baseUrl + '/#organization' },
+  });
+}
+
 function seoBlock({ path, title, description, image, noindex }) {
   const url = baseUrl + path;
   // The homepage title is already the full brand string; the others get the
@@ -65,6 +121,12 @@ function seoBlock({ path, title, description, image, noindex }) {
     '<meta name="twitter:title" content="' + attr(fullTitle) + '" />',
     '<meta name="twitter:description" content="' + attr(description) + '" />',
     '<meta name="twitter:image" content="' + attr(imageUrl) + '" />',
+    // Sitewide rather than homepage-only, so a visitor who lands directly on a
+    // product page from search still arrives at a page that identifies the
+    // brand. @id ties every copy to the same entity rather than declaring
+    // twelve different organizations.
+    '<script type="application/ld+json">' + organizationSchema() + '</script>',
+    '<script type="application/ld+json">' + websiteSchema() + '</script>',
   ]
     .map((line) => '    ' + line)
     .join('\n');
