@@ -48,10 +48,12 @@ function attr(value) {
  * "zeosheilds" mean this company. It used to be added by a useEffect, so it
  * only existed after JavaScript ran and was absent from the first crawl.
  *
- * alternateName lists real ways the brand is written, not deliberate typos.
- * Google corrects misspelled queries from what searchers do, not from markup,
- * so a list of misspellings here would be decoration at best and look
- * manipulative at worst. The fix for typos is owning the typo domains.
+ * alternateName lists the ways people actually write the name, including the
+ * spellings they get wrong. Set expectations honestly: Google corrects a
+ * misspelled query from what searchers type and click, not from markup, so this
+ * is a small bet on entity understanding rather than the thing that makes
+ * "zeosheilds" find this site. It is not misleading, because people really do
+ * write it these ways, and it costs nothing.
  */
 function organizationSchema() {
   return JSON.stringify({
@@ -59,7 +61,15 @@ function organizationSchema() {
     '@type': 'Organization',
     '@id': baseUrl + '/#organization',
     name: siteName,
-    alternateName: ['ZeoShields', 'Zeo Shield', 'Zeo Shields PPF'],
+    alternateName: [
+      'ZeoShields',
+      'Zeo Shield',
+      'Zeo Shields PPF',
+      'Zeo Sheilds',
+      'Zeoshelds',
+      'Zeoshild',
+      'Zeoshield',
+    ],
     url: baseUrl + '/',
     logo: {
       '@type': 'ImageObject',
