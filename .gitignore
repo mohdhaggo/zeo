@@ -49,3 +49,7 @@ wrangler.toml
 *.pem
 *.key
 secrets.json
+
+# Generated locally from the DynamoDB export. Contains customer personal
+# data, so it must never be committed to this public repository.
+registered-warranties.sql
